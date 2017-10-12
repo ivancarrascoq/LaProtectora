@@ -1,0 +1,492 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+
+{% block content%}
+  {% if user.is_authenticated %}
+    {% if user.is_superuser %}<!--admin-->
+
+      {#% block menuleft %#}
+        <div class="col-sm-1 sidenav">
+          {% for i in rall %}
+            <p><a class="rid" href="rendicion/{{i.id}}">[{{i.id}}:{{i.user_id}}]</a></p>
+          {% endfor %}
+        </div >
+      {#% endblock %#}
+
+      {#% block content %#} 
+        <div class="col-sm-11 text-left" id="detalle">
+          <h1>Rendicion</h1>
+          <p class="monto">{{ rid.monto}}</p>
+          <p>Lorem ipsu</p>
+          <hr>
+          <h3>Test</h3>
+          <p>Lorem ipsum...</p>   
+        </div>   
+      {#% endblock %#}
+
+      {#% block menuright %#}
+        <div class="col-sm-2 sidenav">
+          <div class="well">
+            <p>ADS</p>
+          </div>
+          <div class="well">
+            <p>ADS</p>
+          </div>
+        </div>
+      {#% endblock %#}
+
+    {% else %}<!------supervisor------>
+      {#% block menuleft %#}<!--left menu -->
+        <div class="col-md-1 col-xs-2 sidenav">
+          {% for i in rall %}
+            <p><a class="rid" href="http://192.168.40.128:8000/rendicion/{{i.id}}"> {#{i.id}#}{{i.mes_gasto|title|slice:":3"}} ({{i.fecha_subida|date:"Y"}}) </a></p>
+          {% endfor %}
+        </div >
+      {#% endblock %#}
+      {#% block content %#}<!--content-->
+        <div class="col-md-11 col-xs-10 text-left" id="detalle">
+	<!--seccion1-->
+
+	<form class="form-horizontal" id="form-f200" action="{% url 'save_rendicion'%}" method="post">
+	  {% csrf_token %}
+	  <input name="rid" type="hidden" value="{{rid.id}}">
+	  <h2>Editar Rendicion <button type="submit" class="btn btn-success" id="actualizar">Guardar</button></h2>
+
+	<fieldset>
+	
+	<!-- Form Name -->
+	<legend>Seccion I - Informacion General</legend>
+      <div class="col-sm-9">
+	<!-- Text input-->
+	<div class="control-group col-xs-3">
+	  <label class="control-label" for="user_id">Nombre del Resposable</label>
+	  <div class="controls">
+	    <input id="user_id" name="user_id" type="text" value="{{user}}" class="form-control" readonly>
+	  </div>
+	</div>
+	<!-- Select Basic -->
+	<div class="control-group col-xs-3">
+	  <label class="control-label" for="centro_costo">Centro de Costo</label>
+	  <div class="controls">
+              <select id="centro_costo" name="0" class="form-control">
+                {% for i in centrocosto %}
+                  <option value="{{i.id}}"
+                  {% if rid.centro_costo_id == i.id %}selected{% endif %}
+                  >{{ i.nombre }}</option>
+                {% endfor %}
+              </select>
+	  </div>
+	</div>
+	
+	<!-- Select Basic -->
+	<div class="control-group col-xs-3">
+	  <label class="control-label" for="mes_gasto">Mes a Rendir/Reembolsar</label>
+	  <div class="controls">
+              <select id="mes_gasto" name="0" class="form-control">
+                {% for i in mes %}
+                  <option value="{{ i }}"
+                  {% if rid.mes_gasto == i %}selected{% endif %}
+                  >{{ i }}</option>
+                {% endfor %}
+              </select>
+	  </div>
+	</div>
+	
+	<!-- Text input-->
+	<div class="control-group col-xs-3">
+	  <label class="control-label" for="textinput">Fecha Rendicion/Reembolso</label>
+	  <div class="controls">
+            <input id="fecharendicion" name="0" type="date" placeholder="dd/mm/yyyy"
+            value="{{rid.fecha_subida|date:"Y-m-d"}}"
+            class="form-control">
+	  </div>
+	</div>
+	
+	<!-- Select Basic -->
+	<div class="control-group col-xs-4">
+	  <label class="control-label" for="tipo_fondo">Fondo a Rendir - Tipo</label>
+	  <div class="controls">
+              <select id="tipo_fondo" name="0" class="form-control">
+                {% for i in tipofondo %}
+                  <option value="{{i.id}}"
+                  {% if rid.tipo_fondo_id == i.id %}selected{% endif %}
+                  >{{i.nombre}}</option>
+                {% endfor %}
+              </select>
+	  </div>
+	</div>
+
+	<!-- Select Basic -->
+	<div class="control-group col-xs-4">
+	  <label class="control-label" for="subvencion">Subvencion</label>
+	  <div class="controls">
+              <select id="subvencion" name="0" class="form-control">
+                {% for i in subvencion %}
+                <option value="{{i.id}}"
+                {% if rid.subvencion_id == i.id %}selected{% endif %}
+                >{{i.nombre|title}}</option>
+                {% endfor %}      
+              </select>
+	  </div>
+	</div>
+	
+	<!-- Text input-->
+	<div class="control-group col-xs-4">
+	  <label class="control-label" for="monto">Monto</label>
+	  <div class="controls">
+            <input id="monto" value="{{rid.monto}}" name="0" type="text" placeholder="$" class="form-control"> 
+	  </div>
+	</div>
+      </div>
+      <div class="col-sm-3" style="border: 4px silver solid;">
+        <h1>Falta Por Rendir</h1>
+        <h2>$ .-</h2>
+      </div>
+	</fieldset>
+	
+	<!--end seccion1-->
+	
+	<!--seccion3 detalle-->
+	
+	<fieldset>
+<style>
+
+#user_id, #centro_costo, #mes_gasto, #tipo_fondo, #subvencion {text-transform: capitalize;}
+.table>tbody>tr>td, .table>tbody>tr>th {padding: 0px;}
+.form-control {padding: 0px; border-radius:0px;}
+.tablefd {display: block;overflow-x: auto;}
+#cheque,#doc_no_cheque, #proveedor_rut {width: 100px;}
+#proveedor_nombre, #doc_monto, #gasto {width: 150px;}
+#doc_tipo_id, #doc_no, #doc_detalle, #contabilidad_id, #contabilidad_hijo_id {width: 200px;} 
+#categoria_id, #subcategoria_id {width:300px}
+</style>	
+	<!-- Form Name -->
+	<legend>Seccion II - Gastos</legend>
+	
+        <table class="tablefd" id="tablefd">
+	  <thead>
+	    <tr>
+              <th></th>
+              <th><span class="glyphicon glyphicon-cog"></span></th>
+              <th>Tipo de Pago</th>
+              <th>No. Cheque</th>
+	      <th>Tipo de Documento</th>    
+	      <th>No. de Documento</th>    
+	      <th>Fecha documento</th>    
+	      <th>Fecha de pago</th>    
+              <th>Descripcion del gasto</th>    
+              <th>Rut Proveedor</th>    
+              <th>Nombre Proveedor</th>    
+              <th>Monto Gasto</th>    
+              <th>Monto Documento</th>    
+              <!--th>No. Cheque</th-->    
+              <th>Cuenta Presupuesto</th>    
+              <th>Sub Cuenta Presupuesto</th>
+              <th>Cuenta SuperEduc</th>
+              <th>Sub Cuenta SuperEduc</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% if not rfd_array %}<tr><td colspan="16" style="text-align: center;">No se encontraron registros</td></tr>{% endif %}
+
+          {% for a in rfd_array %}
+            <tr class="{{a.first.id}}">
+               <th>{{ forloop.counter }}</th>
+               <td>
+                 <!--a href="{% url 'delfd' %}?rid={{rid.id}}&fd_id={{a.first.id}}"-->
+		 <span data-id="{{a.first.id}}" class="glyphicon glyphicon-trash"></span><!--/a-->
+               </td>
+
+               <td><!--tipo de pago--><!--cheque-->
+                 <!--input id="cheque" name="{{a.first.id}}" type="text" class="form-control" value=
+		   "{% if a.first.cheque == '1' %}Cheque{% elif a.first.cheque == '0' %}Efectivo{% else %}-{% endif %}"
+		 -->
+                 <div class="controls">
+                   <select id="cheque" name="{{a.first.id}}" class="form-control">
+                     {% for i in cheque %}
+                        <option value="{{i.0}}" {% if a.first.cheque == i.0 %}selected{% endif %}>{{i.1}}</option>
+                     {% endfor %}
+	    	     {% if a.first.cheque is None  %}
+		          <option value="" selected></option>
+		     {% endif %}
+                   </select>
+                 </div> 
+               </td>
+               <td><!--no cheque--><!--doc_no_cheque-->
+                 <input id="doc_no_cheque" name="{{a.first.id}}" type="text" class="form-control" value=
+		   {% if a.first.cheque == None or a.first.cheque == '0' %}
+                     "" readonly
+                   {% else %}
+                     "{{a.first.doc_no_cheque}}"
+                   {% endif %}
+		 > 
+                 <!--script>$(document).ready(function(){
+var n = $('#cheque')
+
+});</script-->
+               </td>
+               <td><!--tipo de doc--><!--doc_tipo_id-->
+                 <input id="doc_tipo_id" name="{{a.first.id}}" type="text" class="form-control" value="{{a.first.doc_tipo.nombre|title}}">
+               </td>
+               <td><!--no. de doc - cod BBDD desde doc tipo id--><!--doc_no-->
+                 <input id="doc_no" name="{{a.first.id}}" type="text" class="form-control" value=
+		   {% if a.first.doc_no == None %}""{% else %}"{{a.first.doc_no}}"{% endif %}
+		 >
+               </td>
+               <td><!--fecha doc--><!--doc_fecha-->
+                 <input id="doc_fecha" name="{{a.first.id}}" type="date" class="form-control" value="{{a.first.doc_fecha|date:"Y-m-d"}}">
+               </td>
+               <td><!--fecha de pago-->
+                 <input id="doc_fecha_pago" name="{{a.first.id}}" type="date" class="form-control" value="{{a.first.doc_fecha_pago|date:"Y-m-d"}}">
+               </td>
+               <td><!--descripcion del gasto-->
+                 <input id="doc_detalle" name="{{a.first.id}}" type="text" class="form-control" value="{{a.first.doc_detalle}}">
+               </td>
+               <td><!--rut proveedor-->
+                 <input id="proveedor_rut" name="{{a.first.id}}" type="text" class="form-control" value="{{a.first.proveedor_rut}}">
+               </td>
+               <td><!--nombre proveedor-->
+                 <input id="proveedor_nombre" name="{{a.first.id}}" type="text" class="form-control" value="{{a.first.proveedor_nombre|title}}">
+               </td>
+               <td><!--monto gasto-->
+                 <input id="gasto" name="{{a.first.id}}" type="text" class="form-control" value="{{a.first.gasto}}">
+               </td>
+               <td><!--monto doc-->
+                 <input id="doc_monto" name="{{a.first.id}}" type="text" class="form-control" value="{{a.first.doc_monto}}">
+               </td>
+               <td><!--cuenta presupuesto-->
+                 <input id="contabilidad_id" name="{{a.first.id}}" type="text" class="form-control" value="{{a.first.contabilidad.nombre|title}}">
+               </td>
+               <td><!--sub cuenta presupuesto-->
+                 <input id="contabilidad_hijo_id" name="{{a.first.id}}" type="text" class="form-control" value="{{a.first.contabilidad_hijo.nombre|title}}">
+               </td>
+               <td><!--cuenta supereduc: categoria-->
+                 <input id="categoria_id" name="{{a.first.id}}" type="text" class="form-control" value="{{a.first.categoria.nombre|title}}">
+               </td>
+               <td><!--sub cuenta supereduc: subcategoria-->
+                 <input id="subcategoria_id" name="{{a.first.id}}" type="text" class="form-control text-capitalize" value="{{a.first.subcategoria.nombre|title}}">
+               </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+
+<!-- Button -->
+  <!--div class="controls"><a class="btn btn-success" id="addfd" href="#" role="button">Agregar</a></div-->
+  <!--form method="post" id="addfd" action="add/fd">{#% csrf_token %#}<input class=" btn btn-success" type="submit" value="+" ></form-->
+
+  <br/>
+  <button id="addfd" data-id="{{rid.id}}" class="fd btn btn-primary" type="button">Agregar</button>
+
+  <!--a href="{% url 'addfd' %}?rid={{rid.id}}" class="btn btn-success" type="button" onclick="document.getElementById('form-f200').submit();">Agregar</a-->
+
+<!--js del fd-->
+  <script type="text/javascript">
+    $('td>span').on('click',function(e){
+        e.preventDefault();
+        var element = $(this);
+        console.log(element);
+        $.ajax({
+            type: 'GET',
+            url: '/delfd/',
+            data: { rid : {{rid.id}}, fd_id: element.attr("data-id") },
+            success: function(response){
+			                element.closest("tr").remove();
+			                /*alert('success!');*/
+           			        },
+              });
+/*	element.closest('tr').remove();*/
+    });
+  </script>
+
+<!--js del new>
+  <script type="text/javascript">
+    $('td').on('click',function(e){
+        e.preventDefault();
+        var element = $(this);
+        console.log(element);
+/*        $.ajax({
+            type: 'GET',
+            url: '/delfd/',
+            data: { rid : {{rid.id}}, fd_id: element.attr("data-id") },
+            success: function(response){
+                                        element.closest("tr").remove();
+                                        },
+              });
+*/
+    });
+  </script-->
+
+
+<!--js add -->
+  <script type="text/javascript">
+    $('button.fd').on('click',function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '/addfdjs/',
+            data: { rid : {{rid.id}} },
+            success: function(response){
+		$('.tablefd').append(
+		       '<tr class="' + response + '">'
+		      +'<th>{{ rfd_array.count }}</th>'
+		      +'<td><span data-id="'+ response + '" class="glyphicon glyphicon-trash"></span></td>'
+        	      +'<td><input type="text" class="form-control" value="" readonly></td>'
+        	      +'<td><input type="text" class="form-control" value="" readonly></td>'
+        	      +'<td><input type="text" class="form-control" value="" readonly></td>'
+        	      +'<td><input type="text" class="form-control" value="" readonly></td>'
+        	      +'<td><input type="text" class="form-control" value="" readonly></td>'
+        	      +'<td><input type="text" class="form-control" value="" readonly></td>'
+        	      +'<td><input type="text" class="form-control" value="" readonly></td>'
+        	      +'<td><input type="text" class="form-control" value="" readonly></td>'
+        	      +'<td><input type="text" class="form-control" value="" readonly></td>'
+        	      +'<td><input type="text" class="form-control" value="" readonly></td>'
+        	      +'<td><input type="text" class="form-control" value="" readonly></td>'
+        	      +'<td><input type="text" class="form-control" value="" readonly></td>'
+        	      +'<td><input type="text" class="form-control" value="" readonly></td>'
+        	      +'<td><input type="text" class="form-control" value="" readonly></td>'
+        	      +'<td><input type="text" class="form-control" value="" readonly></td>'
+		      +'</tr>'
+		);
+                /*alert('para poder llenar el registro debe presionar el boton Guardar!');*/
+            }
+        });
+    });
+  </script>
+<!--+'<a href="{% url 'delfd' %}?rid={{rid.id}}&fd_id=' + response + '">'-->
+
+</fieldset>
+
+<br/>
+
+<!--end seccion3 detalle-->
+
+<!--seccion devolucion -->
+
+        <fieldset>
+		<!--style>
+		.table>tbody>tr>td, .table>tbody>tr>th {padding: 0px;}
+		.form-control {padding: 0px; border-radius:0px;}
+		</style-->
+        <!-- Form Name -->
+        <legend>Seccion III - Devoluci&oacute;n</legend>
+
+        <table class="tablegd">
+          <thead>
+            <tr>
+              <th></th>
+              <th><span class="glyphicon glyphicon-cog"></span></th>
+              <th>Detalle</th>
+              <th>No. Devolucion</th>       
+              <th>Fecha</th>  
+              <th>Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% if not rgd_array %}<tr><td colspan="16" style="text-align: center;">No se encontraron registros</td></tr>{% endif %}
+
+          {% for a in rgd_array %}
+            <tr class="{{a.first.id}}">
+               <th>{{ forloop.counter }}</th>
+               <td>
+                 <!--a href="{% url 'delgd' %}?rid={{rid.id}}&gd_id={{a.first.id}}"--><span data-id="{{a.first.id}}" class="glyphicon glyphicon-trash"></span></a>
+               </td>
+               <td>
+		 <input id="detalle" name="g{{a.first.id}}" type="text" class="form-control" value="{{a.first.detalle}}">
+	       </td>
+               <td>
+	         <input id="deposito_no" name="g{{a.first.id}}" type="text" class="form-control" value="{{a.first.deposito_no}}">
+	       </td>
+               <td><input id="fecharendicion" name="g{{a.first.id}}" type="date" placeholder="dd/mm/yyyy"
+                    value="{{a.first.fecha|date:"Y-m-d"}}"
+                    class="form-control"></td>
+               <td>
+		 <input id="monto" name="g{{a.first.id}}" type="text" class="form-control" value="{{a.first.monto}}">
+	       </td>
+	    </tr>
+	  {% endfor %}
+	  </tbody>
+	</table>
+
+<!-- agregar -->
+  <!--a href="{% url 'addgd' %}?rid={{rid.id}}" class="btn btn-success" type="button">Agregar</a-->
+
+	</fieldset>
+  <br/>
+  <button id="addgd" data-id="{{rid.id}}" class="gd btn btn-primary" type="button">Agregar</button>
+
+<!--js add gd-->
+  <script type="text/javascript">
+    $('button.gd').on('click',function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '/addgdjs/',
+            data: { rid : {{rid.id}} },
+            success: function(response){
+                $('.tablegd').append(
+                       '<tr class="' + response + '">'
+                      +'<th></th>'
+                      +'<td><span data-id="'+ response + '" class="glyphicon glyphicon-trash"></span></td>'
+                      +'<td><input type="text" class="form-control" value="" readonly></td>'
+                      +'<td><input type="text" class="form-control" value="" readonly></td>'
+                      +'<td><input type="text" class="form-control" value="" readonly></td>'
+                      +'<td><input type="text" class="form-control" value="" readonly></td>'
+                      +'</tr>'
+                );
+	    console.log('after success');
+            				}
+
+            });
+    });
+  </script>
+<!--js del gd-->
+  <script type="text/javascript">
+    $('td>span').on('click',function(e){
+        e.preventDefault();
+        var element = $(this);
+        $.ajax({
+            type: 'GET',
+            url: '/delgd/',
+            data: { rid : {{rid.id}}, gd_id: element.attr("data-id") },
+            success: function(response){
+                                        element.closest("tr").remove();
+                                        /*alert('success!');*/
+                                        },
+              });
+/*      element.closest('tr').remove();*/
+    });       
+  </script>
+
+
+
+
+<!--end seccion devolucion-->
+
+</form>
+          <!--{{ rid.monto}}-->
+       </div>
+      {#% endblock %#}
+
+
+
+
+      {#% block menuright %#}<!--right menu-->
+        <!--div class="col-sm-2 sidenav">
+          <div class="well">
+            <p>ADS</p>
+          </div>
+          <div class="well">
+            <p>ADS</p>
+          </div>
+        </div-->
+      {#% endblock %#}
+
+
+    {% endif %}
+  {% else %}
+    Usuario no registrado! 
+  {% endif %}
+
+{% endblock %}

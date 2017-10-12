@@ -1,0 +1,358 @@
+from django.shortcuts import render
+from django.http import HttpResponseRedirect, HttpResponse
+
+from .models import *
+from .forms import LoginForm, EditForm
+from django.contrib.auth import authenticate, login, logout
+
+import datetime
+import numpy as np
+import json 
+
+from django.http import JsonResponse
+from django.forms.models import model_to_dict
+
+
+#WizardForm
+#from formtools.wizard.views import SessionWizardView
+#import logging
+
+
+# Create your views here.
+
+def index(request):
+    user = request.user
+    rendicion = Rendicion.objects.filter(user_id = user.id)
+    auth = request.user.is_authenticated()
+#    for j in context:
+    print auth
+    print "usuario: " + str(user.id)
+    return render(request, 'index.html', {'context': rendicion, 'auth':auth})
+
+
+def profile(request, username):
+    user = User.objects.get(username=username)
+    print user.id
+    rendicion = Rendicion.objects.filter(user=user)
+    return render(request, 'profile.html', {'username': username, 'rendicion': rendicion})
+
+def detail(request):
+    return render(request, 'index.html')
+
+def edit(request, rid):
+    print 'Edit.html'
+#    print rid
+    user = request.user
+    if Rendicion.objects.filter(id = rid,user_id = user.id).exists() == False or Rendicion.objects.filter(id = rid).first().locked == 1:
+        return HttpResponseRedirect('/')
+    centrocosto = CentroCosto.objects.all()
+    mes = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
+    tipofondo = TipoFondo.objects.all()
+    subvencion = Subvencion.objects.all()
+    #cheque = {'1':'Cheque','0':'Efectivo'}
+    cheque = [['0','Efectivo'],['1','Cheque'],['2','-']]
+    doctipo = DocTipo.objects.all()
+    contabilidad = Contabilidad.objects.all()
+    rall = Rendicion.objects.filter(user_id = user.id)
+    rid = Rendicion.objects.get(pk=rid)
+    categoria = Categoria.objects.filter(subvencion_id = rid.subvencion_id)
+    #fondo
+    rfd = RendicionesFondosDetalles.objects.filter(rendicion_id = rid)
+    rfd_count = rfd.count()
+    rfd_array = list()#range(rfd_count))
+    for j in rfd:
+##        print 'RFD '+str(j.id)+' fondo_id: '+str(j.fondos_detalles_id)+', rendicion id: '+str(j.rendicion_id)
+	rfd_array.append(FondoDetalle.objects.select_related('doc_tipo','proveedor','contabilidad',
+        'contabilidad_hijo','categoria','subcategoria').filter(id = int(j.fondos_detalles_id)))
+#        rfd_array.append(FondoDetalle.objects.select_related('doc_tipo').select_related('proveedor').
+#        select_related('contabilidad').select_related('contabilidad_hijo').
+#        select_related('categoria').select_related('subcategoria').
+#        filter(id = int(j.fondos_detalles_id)))
+##    print rfd_array
+##    print "for in array"
+#    for a in rfd_array:
+#        print a[0]
+    #gasto: devolucion
+
+    rgd = RendicionesGastoDetalles.objects.filter(rendicion_id = rid)
+    rgd_count = rgd.count()
+    rgd_array = list()
+    for j in rgd:
+##        print 'RGD '+str(j.id)+' gasto_id: '+str(j.gastos_detalles_id)+', rendicion id: '+str(j.rendicion_id)
+        rgd_array.append(GastoDetalle.objects.filter(id = int(j.gastos_detalles_id)))
+##    print rgd_array
+##    print "for in array"
+    for a in rgd_array:
+        print a[0]
+
+    xrendir = 0
+##    xrendir = rid.monto
+    sum_gasto = 0
+    sum_dev = 0
+    for x in rfd.select_related('fondos_detalles'):
+        try:
+            sum_gasto += x.fondos_detalles.gasto
+        except:
+            sum_gasto = 0
+##    print "sum gasto " + str(sum_gasto)
+    for x in rgd.select_related('gastos_detalles'):
+        try:
+            sum_dev += x.gastos_detalles.monto
+        except:
+            sum_dev = 0
+##    print "sum dev " + str(sum_dev)
+    xrendir = rid.monto - sum_gasto - sum_dev
+
+
+    return render(request, 'edit.html', {'centrocosto': centrocosto, 'mes': mes, 'tipofondo': tipofondo, 
+    'subvencion': subvencion, 'rid': rid, 'rall':rall, 'rfd_array': rfd_array, 'rgd_array': rgd_array,
+    'cheque': cheque, 'doctipo': doctipo, 'contabilidad': contabilidad, 'categoria': categoria, 'xrendir': xrendir })
+
+def addfd(request):
+    print 'Add FD:'
+    rid = request.GET['rid']
+    print rid
+    print 'crear fd'
+    fd = FondoDetalle.objects.create(categoria_id = '55', contabilidad_id = '24', contabilidad_hijo_id = '57',
+         doc_tipo_id = '19', proveedor_id = '3', subcategoria_id = '234')
+    fd_id = str(fd.id)
+    print 'FondoDetalle.id: ' + str(fd_id)
+    rfd = RendicionesFondosDetalles.objects.create(fondos_detalles_id = fd_id,rendicion_id = rid)
+#    return HttpResponse(0)
+    return HttpResponseRedirect('/rendicion/'+rid)
+
+def addfdjs(request): 
+    print 'Add FD:'
+    rid = request.GET['rid']
+    print rid          
+    print 'crear fd' 
+    fd = FondoDetalle.objects.create(cheque = 2, categoria_id = 55, contabilidad_id = 24, contabilidad_hijo_id = 57,
+         doc_tipo_id = '19', proveedor_id = '3', subcategoria_id = 234, doc_fecha = '2017-01-01',
+         doc_fecha_pago = '2017-01-01', doc_monto = 0, gasto = 0)
+    fd_id = str(fd.id)
+    print 'FondoDetalle.id: ' + str(fd_id)
+    rfd = RendicionesFondosDetalles.objects.create(fondos_detalles_id = fd_id,rendicion_id = rid)
+    return HttpResponse(fd_id)
+
+def delfd(request):
+    print 'Del FD:'
+    rid = request.GET['rid']
+    fd_id = request.GET['fd_id']
+#    print rid
+    print 'borrar registro: rid' + str(rid) + ', fd: ' + str(fd_id)
+    FondoDetalle.objects.filter(id = fd_id).delete()
+    RendicionesFondosDetalles.objects.filter(rendicion_id = rid, fondos_detalles_id = fd_id).delete()
+#    return HttpResponseRedirect('/rendicion/'+rid)
+    return HttpResponse(0)
+
+def addgd(request):
+    print 'Add GD:'
+    rid = request.GET['rid']
+    print rid
+    print 'crear gd'
+    gd = GastoDetalle.objects.create(fecha = '2017-01-01', monto = 0)
+    gd_id = str(gd.id)
+    print 'GastoDetalle.id: ' + str(gd_id)
+    rfd = RendicionesGastoDetalles.objects.create(gastos_detalles_id = gd_id,rendicion_id = rid)
+#    return HttpResponseRedirect('/rendicion/'+rid)
+    return HttpResponse(0)
+
+def addgdjs(request):
+    print 'Add GD:'
+    rid = request.GET['rid']
+    print rid
+    print 'crear gd'
+    gd = GastoDetalle.objects.create(fecha = '2017-01-01', monto = 0)
+    gd_id = str(gd.id)
+    print 'GastoDetalle.id: ' + str(gd_id)
+    rgd = RendicionesGastoDetalles.objects.create(gastos_detalles_id = gd_id,rendicion_id = rid)
+    return HttpResponse(gd_id)
+
+def delgd(request):
+    print 'Del GD:'
+    rid = request.GET['rid']
+    gd_id = request.GET['gd_id']    
+    print 'borrar registro: rid' + str(rid) + ', gd: ' + str(gd_id)
+    GastoDetalle.objects.filter(id = gd_id).delete()
+    RendicionesGastoDetalles.objects.filter(rendicion_id = rid, gastos_detalles_id = gd_id).delete()
+    return HttpResponseRedirect('/rendicion/'+rid)
+
+def new(request):
+    print 'New.html'
+    #rendicion = Rendicion.objects.all()
+    centrocosto = CentroCosto.objects.all()
+    mes = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
+    tipofondo = TipoFondo.objects.all()
+    subvencion = Subvencion.objects.all()
+    return render(request, 'new.html', {'centrocosto': centrocosto, 'mes': mes, 'tipofondo': tipofondo, 'subvencion': subvencion})
+
+
+
+def login_view(request):
+#    print 'login_view'
+    if request.method == 'POST':
+#        print 'if post'
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            u = form.cleaned_data
+            p = form.cleaned_data
+#            print u['username']
+            user = authenticate(username = u['username'], password = p['password'])
+            print user
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    return HttpResponseRedirect('/')
+                else:
+                    print("Esta cuenta esta deshabilitada") #consola por ahora
+            else:
+                print("El usuario o/y contrasena estan incorrectas")
+                return HttpResponseRedirect('/')
+    else:
+#        print 'else...'
+        form = LoginForm()
+        return render(request, 'login.html', {'form':form})
+
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect('/')
+
+
+def post_rendicion(request):
+    form = request.POST
+    print form 
+    a = int(form['user_id'])
+    b = datetime.datetime.strptime(str(form['fecharendicion']), '%Y-%m-%d')
+#, '%d/%m/%Y').strftime('%Y-%m-%d')
+#    b = datetime.datetime.strptime(str(form['fecharendicion']), '%Y-%m-%d')
+    c = str(form['mes_gasto'])
+    d = int(form['monto'])
+    e = int(form['centro_costo'])
+    f = int(form['subvencion'])
+    g = int(form['tipo_fondo'])
+    print "fecha", b
+    rendicion = Rendicion( user_id = a, fecha_subida = b, mes_gasto = c, monto = d, centro_costo_id = e, subvencion_id = f, tipo_fondo_id =  g, locked = 0)
+    print rendicion
+    rendicion.save()
+    rid = str(rendicion.id)
+#    print "rendicion: ", rendicion.id
+#    return HttpResponseRedirect('/') 
+    return HttpResponseRedirect('rendicion/' + rid )
+
+
+def save_rendicion(request):
+    form = request.POST
+    rid =  form['rid']
+    print 'Rendicion: ' + str(rid)
+    print '===== SAVE Rendicion ====='
+#    print form
+#    print '--------values()--------'
+    form = dict(form.iterlists())
+    for i in form:
+        try:
+	    i = int(i)
+#seccion II
+            if type(i) == int and i > 0:
+                print 'ID fondos - seccion II: ' + str(i)
+                print form[str(i)]
+                print '########cheque###########' + form[str(i)][0]
+                FondoDetalle.objects.filter(id = i).update(
+                 categoria_id = form[str(i)][0],
+                 subcategoria_id = form[str(i)][1],
+                 cheque = int(form[str(i)][2]),
+                 doc_no_cheque = form[str(i)][3],
+                 doc_tipo_id = form[str(i)][4],
+                 doc_no = form[str(i)][5],
+                 doc_fecha = form[str(i)][6], 
+                 doc_fecha_pago = form[str(i)][7],
+                 doc_detalle = form[str(i)][8],
+                 proveedor_rut = form[str(i)][9],
+                 proveedor_nombre = form[str(i)][10],
+                 gasto = form[str(i)][12],
+                 doc_monto = form[str(i)][11],
+                 contabilidad_id = form[str(i)][13],
+                 contabilidad_hijo_id = form[str(i)][14],
+#                 categoria_id = form[str(i)][13],
+#                 subcategoria_id = form[str(i)][14],
+                )
+            else:
+#seccion I
+                print 'ID general - seccion I: ' + str(i)
+                Rendicion.objects.filter(id=rid).update(
+                 fecha_subida = form[str(i)][2],
+                 mes_gasto = form[str(i)][1],
+                 monto = form[str(i)][5],
+                 centro_costo_id = form[str(i)][0],
+                 subvencion_id = form[str(i)][4],
+                 tipo_fondo_id = form[str(i)][3],
+                )
+        except:
+#seccion III
+            i = str(i)
+            if i.startswith('g'):
+                j = i[1:]
+                print 'ID gastos - seccion III: ' + j
+                print form[i] 
+                GastoDetalle.objects.filter(id=j).update(
+                 detalle = form[i][0],
+                 deposito_no = form[i][1],
+                 fecha = form[i][2],
+                 monto = form[i][3],
+                )
+            pass
+    return HttpResponseRedirect('rendicion/' + rid)
+
+def jscontahijo(request):
+    contaid = request.GET['contaid']
+#    print 'jscontahijo, conta id: ' + str(contaid)
+    contahijo = list(ContabilidadHijo.objects.filter(contabilidad_id = contaid).values('nombre', 'id'))
+    return HttpResponse(json.dumps(contahijo),content_type="application/json")
+
+def jssubcat(request):
+    catid = request.GET['catid']
+    subcat = list(Subcategoria.objects.filter(categoria_id = catid).values('nombre', 'id'))
+    return HttpResponse(json.dumps(subcat),content_type="application/json")
+
+
+def reports(request, rid):
+    print "reports.html"
+    user = request.user
+    print "rid 1: " + str(rid)
+    if rid != '0':
+        if Rendicion.objects.filter(id = rid,user_id = user.id).exists() == False or Rendicion.objects.filter(id = rid).first().locked == 0:
+            return HttpResponseRedirect('/') 
+
+    rall = Rendicion.objects.filter(user_id = user.id, locked = 1)
+    rid = Rendicion.objects.filter(id = rid, user_id = user.id, locked = 1).select_related(
+	  'centro_costo','subvencion','tipo_fondo').first()
+    print "rid 2: " + str(rid)
+    rfd = RendicionesFondosDetalles.objects.filter(rendicion_id = rid)
+    rfd_count = rfd.count()
+    rfd_array0 = list()
+    rfd_array1 = list()
+
+    #cheque
+    for j in rfd:
+        if FondoDetalle.objects.filter(id = int(j.fondos_detalles_id)).filter(cheque = '0' ).first():
+            rfd_array0.append(FondoDetalle.objects.select_related('doc_tipo','proveedor','contabilidad',
+            'contabilidad_hijo','categoria','subcategoria').filter(id = int(j.fondos_detalles_id)).filter(cheque = '0' ))
+
+    #efectivo
+    for j in rfd:
+        if FondoDetalle.objects.filter(id = int(j.fondos_detalles_id)).filter(cheque = '1' ).first():
+            rfd_array1.append(FondoDetalle.objects.select_related('doc_tipo','proveedor','contabilidad',
+            'contabilidad_hijo','categoria','subcategoria').filter(id = int(j.fondos_detalles_id)).filter(cheque = '1' ))
+
+    #devolucion
+    rgd = RendicionesGastoDetalles.objects.filter(rendicion_id = rid)
+    rgd_array = list()
+    for j in rgd:
+        rgd_array.append(GastoDetalle.objects.filter(id = int(j.gastos_detalles_id)))
+
+    return render(request, 'reportes.html', {'rall': rall, 'rid': rid, 'rfd_array0': rfd_array0, 'rfd_array1': rfd_array1, 'rgd_array': rgd_array })
+
+
+def lock_rendicion(request, rid):
+    print 'lock rid: ' + str(rid)
+    Rendicion.objects.filter(id = rid).update(locked = 1)    
+    return HttpResponseRedirect('/')

@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content%}
+  {% if user.is_authenticated %}<!--autenticado-->
+    {#%if user.is_superuser %#}<!--administrador-->
+
+      <!--{#% block menuleft %#}
+        <div class="col-sm-1 sidenav">
+          {% for i in context %}
+            <p><a class="rid" href="/rendicion/{{i.id}}">[{{i.id}}:{{i.user_id}}]</a></p>
+          {% endfor %}
+        </div >
+      {#% endblock %#}
+
+      {#% block content %#} 
+        <div class="col-sm-10 text-left" id="detalle">
+          <h1>Reportes</h1>
+          <p>cheque/Efectivo</p>
+          <hr>
+          <h3>Test</h3>
+          <p>Lorem ipsum...</p>             
+        </div>   
+      {#% endblock %#}
+
+      {#% block menuright %#}
+        <div class="col-sm-1 sidenav">
+          <div class="well">
+            <p>ADS</p>
+          </div>
+          <div class="well">
+            <p>ADS</p>
+          </div>
+        </div>
+      {#% endblock %#}-->
+
+    {#% else %#}<!--supervisor-->
+
+
+      {#% block menuleft %#}
+        <div class="col-sm-1 sidenav">
+          <p><span class="titulo-sidenav">Rendiciones cerradas</span></p>
+	  <!--h4>Rendiciones Cerradas</h4-->
+          {% for i in rall %}
+	    {% if rid.id == i.id %}
+            <p><a class="rid active" href="javascript:void(0);">{{forloop.counter}}. {{i.subvencion.nombre|upper|slice:":3"}} {{i.mes_gasto|title|slice:":3"}}-{{i.fecha_subida|date:"Y"}} ({{i.id}})<!--{{i.user_id}}]--></a></p>
+	    {% else %}
+	    <p><a class="rid" href="/reportes/{{i.id}}">{{forloop.counter}}. {{i.subvencion.nombre|upper|slice:":3"}} {{i.mes_gasto|title|slice:":3"}}-{{i.fecha_subida|date:"Y"}} ({{i.id}})<!--{{i.user_id}}]--></a></p>
+	    {% endif %}
+          {% endfor %}
+        </div >
+      {#% endblock %#}
+
+      {#% block content %#}
+        <div class="col-sm-11 text-left" id="detalle">
+	{% if rid != None %}
+          <h2>Portal de Reportes <button id="print-button" onclick="myFunction()" class="btn btn-success">Imprimir</button></h2> 
+          <!--div class="col-md-12"-->
+                <div class="panel panel-group panel-default">
+                      <div class="panel-heading"><h3>Rendici&oacute;n No. {{rid.id}}</h3></div>
+                </div>
+          <!--/div-->
+          <!--p class="monto">
+          <a class="btn btn-primary" role="button" href="/new/"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Crear</a>
+          </p><p></p><hr><h3>Reportes</h3>
+          <p>Reportes para areas contables Cheque / Efectivo</p>
+          <p class="monto"><a class="btn btn-success" role="button" href="/reportes/">Acceder</a>
+          </p-->
+
+
+	<!--button id="print-button" onclick="myFunction()" class="btn btn-success">Imprimir</button-->
+	<style>
+	@media print {
+	body {font-size: 10px;}
+	h4 {font-size: 12px;}
+	@page {size: landscape;}
+	#print-button{display:none;}
+	.break {page-break-after: always;}
+	.print-hidden {display:block;}
+	}
+	.print-hidden {display:none;}
+	</style>
+	<script>
+	/*function myFunction() {
+	    window.print();
+	}*/
+
+
+	function myFunction() {
+	     var printContents = document.getElementById('detalle').innerHTML;
+	     var originalContents = document.body.innerHTML;
+	     document.body.innerHTML = printContents;
+	     window.print();
+	     document.body.innerHTML = originalContents;
+	}
+	</script><br/>
+
+
+	  <table class="table-bordered table-striped table-condensed reportes">
+            <tr><th>Centro de Costo</th><td>{{rid.centro_costo.nombre}}</td></tr>
+	    <tr><th>Mes a rendir</th><td>{{rid.mes_gasto}}</td></tr>
+	    <tr><th>Fondo a Rendir</th><td>{{rid.tipo_fondo.nombre}}</td></tr>
+            <tr><th>Subvenci&oacute;n</th><td>{{rid.subvencion.nombre}}</td></tr>
+            <tr><th>Monto</th><td>{{rid.monto}}</td></tr>
+          </table>
+
+	  <h4>Devoluci&oacute;n</h4>
+          <table class="table-bordered table-striped table-condensed reportes">
+                <thead>
+                        <tr>
+                                <th>#</th><th>Concepto (por que no se gasto)</th><th>Deposito No.</th><th>Fecha</th><th>Monto</th>
+                        </tr>
+                </thead>
+                <tbody>
+                  {% for i in rgd_array %}
+                    {% if i %}
+                        <tr><!--{{i.first.id}}-->
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ i.first.detalle|lower }}</td>
+                                <td>{{ i.first.deposito_no|lower }}</td>
+                                <td>{{ i.first.fecha|date:"d-m-Y" }}</td>
+                                <td>{{ i.first.monto }}</td>
+                        </tr>
+                    {% endif %}
+                  {% endfor %}
+		        <tr><th colspan="4">Total:</th><td>{%if sum_dev%}{{sum_dev}}{%else%}0{%endif%}</td>
+			</tr>
+                </tbody>
+          </table>
+
+          <hr/>
+	  <div class="break"></div><br class="print-hidden"/>
+          <h4>Detalle Efectivo</h4>
+	  <table class="table-bordered table-striped table-condensed reportes">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Tipo de Documento</th><th>No documento</th><th>Fecha documento</th><th>Fecha de Pago</th>
+				<th>Descripci&oacute;n del Gasto</th><th>Rut Proveedor</th><th>Nombre Proveedor</th><th>Monto Gasto</th>
+				<th>Monto Documento</th><th>Cuenta Presupuesto</th><th>Sub Cuenta Presupuesto</th>
+			</tr>
+		</thead>
+		<tbody>
+		  {% for i in rfd_array0 %}
+		    {% if i %}
+			<tr><!--{{i.first.id}}-->
+				<td>{{ forloop.counter }}</td>
+				<td>{{ i.first.doc_tipo.nombre|lower }}</td>
+				<td>{{ i.first.doc_no|lower }}</td>
+                                <td>{{ i.first.doc_fecha|date:"d-m-Y" }}</td>
+                                <td>{{ i.first.doc_fecha_pago|date:"d-m-Y" }}</td>
+                                <td>{{ i.first.doc_detalle|lower }}</td>
+                                <td>{{ i.first.proveedor_rut }}</td>
+                                <td>{{ i.first.proveedor_nombre|lower }}</td>
+                                <td>{{ i.first.gasto }}</td>
+                                <td>{{ i.first.doc_monto }}</td>
+                                <td>{{ i.first.contabilidad.nombre|lower }}</td>
+                                <td>{{ i.first.contabilidad_hijo.nombre|lower }}</td>
+			</tr>
+		    {% endif %}
+		  {% endfor %}
+			<tr><th colspan="8">Total:</th><td>{% if sum_efectivo %}{{sum_efectivo}}{%else%}0{%endif%}</td>
+                        </tr>
+		</tbody>
+	  </table>
+ 	  <div class="break"></div><br class="print-hidden"/>
+          <h4>Detalle Cheque</h4>
+          <table class="table-bordered table-striped table-condensed reportes">
+                <thead>
+                        <tr>
+                                <th>#</th>
+                                <th>Tipo de Documento</th><th>No documento</th><th>Fecha documento</th><th>Fecha de Pago</th>
+                                <th>Descripci&oacute;n del Gasto</th><th>Rut Proveedor</th><th>Nombre Proveedor</th><th>Monto Gasto</th>
+                                <th>Monto Documento</th><th>No. de Cheque</th><th>Cuenta Presupuesto</th><th>Sub Cuenta Presupuesto</th>
+                        </tr>
+                </thead>
+                <tbody>
+                  {% for i in rfd_array1 %}
+		    {% if i %}
+                        <tr><!--{{i.first.id}}-->
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ i.first.doc_tipo.nombre|lower }}</td>
+                                <td>{{ i.first.doc_no|lower }}</td>
+                                <td>{{ i.first.doc_fecha|date:"d-m-Y" }}</td>
+                                <td>{{ i.first.doc_fecha_pago|date:"d-m-Y" }}</td>
+                                <td>{{ i.first.doc_detalle|lower }}</td>
+                                <td>{{ i.first.proveedor_rut }}</td>
+                                <td>{{ i.first.proveedor_nombre|lower }}</td>
+                                <td>{{ i.first.gasto }}</td>
+                                <td>{{ i.first.doc_monto }}</td>
+				<td>{{ i.first.doc_no_cheque }}</td>
+                                <td>{{ i.first.contabilidad.nombre|lower }}</td>
+                                <td>{{ i.first.contabilidad_hijo.nombre|lower }}</td>
+                        </tr>
+		    {% endif %}
+                  {% endfor %}
+			<tr><th colspan="8">Total:</th><td>{% if sum_cheque %}{{sum_cheque}}{%else%}0{%endif%}</td>
+                        </tr>
+                </tbody>
+          </table>
+
+	  <div class="break"></div><br class="print-hidden"/>
+          <h4>Consolidado</h4>
+          <table class="table-bordered table-striped table-condensed reportes">
+                <thead>
+                        <tr>
+                                <th>#</th>
+                                <th>Cuenta</th><th>Total por cuenta</th><th>Sub Cuenta</th><th>Total Efecivo</th>
+                                <th>Total Cheque</th><th>Total Subcuenta (cheque + efectivo)</th>
+                        </tr>
+                </thead>
+                <tbody>
+			{% for i in c_array2 %}
+			<tr>
+				<td>{{ forloop.counter }}</td>
+				{% if i.8 != 0 %}<td rowspan="{{i.8}}">{#{i.0}#}{{i.6.nombre}}</td>{% endif %}
+				{% if i.8 != 0 %}<td rowspan="{{i.8}}">{{i.1}}</td>{% endif %}
+				<td>{#{i.2}#}{{i.7.nombre}}</td>
+				<td>{{i.4}}</td>
+				<td>{{i.3}}</td>
+				<td>{{i.5}}</td>
+			</tr>
+			{% endfor %}
+                  <!--{% for i in c_array %}
+                    {% if i %}
+                        <tr><{#{i.first.id}#}
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ i.1|lower }}</td>
+                                <td>{{ i.2 }}</td>
+                                <td>{{ i.4|lower }}</td>
+				
+                                <td>{{ i.5 }}</td>
+                                <td>{{ i.7 }}</td>
+				
+                                <td>{{ i.6 }}</td>
+                        </tr>
+                    {% endif %}
+                  {% endfor %}-->
+                </tbody>
+          </table>
+
+      {% else %}
+          <h2>Reportes</h2><br/>
+	  <p>Selecciones una rendici&oacute;n para obtener un reporte</p>
+      {% endif %} 
+        </div>
+      {#% endblock %#}
+
+      {#% block menuright %#}
+        <!--div class="col-sm-1 sidenav">
+          <div class="well">
+            <p>ADS</p>
+          </div>
+          <div class="well">
+            <p>ADS</p>
+          </div>
+        </div-->
+      {#% endblock %#}
+
+    {#% endif %#}
+  {% else %}
+    Usuario no registrado! 
+  {% endif %}
+
+{% endblock %}

@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content%}
+  {% if user.is_authenticated %}<!--autenticado-->
+    {% if user.is_superuser %}<!--administrador-->
+
+      {#% block menuleft %#}
+        <div class="col-sm-2 sidenav">
+          {% for i in context %}
+            <p><a class="rid" href="/rendicion/{{i.id}}">[{{i.id}}:{{i.user_id}}]</a></p>
+          {% endfor %}
+        </div >
+      {#% endblock %#}
+
+      {#% block content %#} 
+        <div class="col-sm-8 text-left" id="detalle">
+          <h1>Reportes</h1>
+          <p>cheque/Efectivo</p>
+          <hr>
+          <h3>Test</h3>
+          <p>Lorem ipsum...</p>             
+        </div>   
+      {#% endblock %#}
+
+      {#% block menuright %#}
+        <div class="col-sm-2 sidenav">
+          <div class="well">
+            <p>ADS</p>
+          </div>
+          <div class="well">
+            <p>ADS</p>
+          </div>
+        </div>
+      {#% endblock %#}
+
+    {% else %}<!--supervisor-->
+
+
+      {#% block menuleft %#}
+        <div class="col-sm-2 sidenav">
+	  <h4>Rendiciones Cerradas</h4>
+          {% for i in rall %}
+            <p><a class="rid" href="/reportes/{{i.id}}">{{i.mes_gasto|title|slice:":3"}}-{{i.fecha_subida|date:"Y"}} ({{i.id}})<!--{{i.user_id}}]--></a></p>
+          {% endfor %}
+        </div >
+      {#% endblock %#}
+
+      {#% block content %#}
+        <div class="col-sm-8 text-left" id="detalle">
+          <h2>Reportes</h2> 
+          <!--p class="monto">
+            <a class="btn btn-primary" role="button" href="/new/"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Crear</a>
+          </p>
+          <p></p>
+          <hr>
+          <h3>Reportes</h3>
+          <p>Reportes para areas contables Cheque / Efectivo</p>
+          <p class="monto">           
+            <a class="btn btn-success" role="button" href="/reportes/">Acceder</a>
+          </p-->
+
+
+<button id="print-button" onclick="myFunction()">Imprimir</button>
+<style>
+@media print {
+body {font-size: 10px;}
+h4 {font-size: 14px;}
+@page {size: landscape;}
+#print-button{display:none;}
+.break {page-break-after: always;}
+}
+</style>
+<script>
+/*function myFunction() {
+    window.print();
+}*/
+
+
+function myFunction() {
+     var printContents = document.getElementById('detalle').innerHTML;
+     var originalContents = document.body.innerHTML;
+     document.body.innerHTML = printContents;
+     window.print();
+     document.body.innerHTML = originalContents;
+}
+</script><br/>
+
+
+	  <table class="table-bordered table-striped table-condensed">
+            <tr><th>Centro de Costo</th><td>{{rid.centro_costo.nombre}}</td></tr>
+	    <tr><th>Mes a rendir</th><td>{{rid.mes_gasto}}</td></tr>
+	    <tr><th>Fondo a Rendir</th><td>{{rid.tipo_fondo.nombre}}</td></tr>
+            <tr><th>Subvencion</th><td>{{rid.subvencion.nombre}}</td></tr>
+            <tr><th>Monto</th><td>{{rid.monto}}</td></tr>
+          </table>
+
+	  <h4>Devolucion</h4>
+          <table class="table-bordered table-striped table-condensed">
+                <thead>
+                        <tr>
+                                <th>#</th><th>Concepto (por que no se gasto)</th><th>Deposito No.</th><th>Fecha</th><th>Monto</th>
+                        </tr>
+                </thead>
+                <tbody>
+                  {% for i in rgd_array %}
+                    {% if i %}
+                        <tr><!--{{i.first.id}}-->
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ i.first.detalle|lower }}</td>
+                                <td>{{ i.first.deposito_no|lower }}</td>
+                                <td>{{ i.first.fecha|date:"d-m-Y" }}</td>
+                                <td>{{ i.first.monto }}</td>
+                        </tr>
+                    {% endif %}
+                  {% endfor %}
+		        <tr><th colspan="4">Total:</th><td>{%if sum_dev%}{{sum_dev}}{%else%}0{%endif%}</td>
+			</tr>
+                </tbody>
+          </table>
+
+          <hr/>
+	  <div class="break"></div><br/>
+          <h4>Detalle Efectivo</h4>
+	  <table class="table-bordered table-striped table-condensed">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Tipo de Documento</th><th>No documento</th><th>Fecha documento</th><th>Fecha de Pago</th>
+				<th>Descripcion del Gasto</th><th>Rut Proveedor</th><th>Nombre Proveedor</th><th>Monto Gasto</th>
+				<th>Monto Documento</th><th>Cuenta Presupuesto</th><th>Sub Cuenta Presupuesto</th>
+			</tr>
+		</thead>
+		<tbody>
+		  {% for i in rfd_array0 %}
+		    {% if i %}
+			<tr><!--{{i.first.id}}-->
+				<td>{{ forloop.counter }}</td>
+				<td>{{ i.first.doc_tipo.nombre|lower }}</td>
+				<td>{{ i.first.doc_no|lower }}</td>
+                                <td>{{ i.first.doc_fecha|date:"d-m-Y" }}</td>
+                                <td>{{ i.first.doc_fecha_pago|date:"d-m-Y" }}</td>
+                                <td>{{ i.first.doc_detalle|lower }}</td>
+                                <td>{{ i.first.proveedor_rut }}</td>
+                                <td>{{ i.first.proveedor_nombre|lower }}</td>
+                                <td>{{ i.first.gasto }}</td>
+                                <td>{{ i.first.doc_monto }}</td>
+                                <td>{{ i.first.contabilidad.nombre|lower }}</td>
+                                <td>{{ i.first.contabilidad_hijo.nombre|lower }}</td>
+			</tr>
+		    {% endif %}
+		  {% endfor %}
+			<tr><th colspan="8">Total:</th><td>{% if sum_efectivo %}{{sum_efectivo}}{%else%}0{%endif%}</td>
+                        </tr>
+		</tbody>
+	  </table>
+ 	  <div class="break"></div><br/
+          <h4>Detalle Cheque</h4>
+          <table class="table-bordered table-striped table-condensed">
+                <thead>
+                        <tr>
+                                <th>#</th>
+                                <th>Tipo de Documento</th><th>No documento</th><th>Fecha documento</th><th>Fecha de Pago</th>
+                                <th>Descripcion del Gasto</th><th>Rut Proveedor</th><th>Nombre Proveedor</th><th>Monto Gasto</th>
+                                <th>Monto Documento</th><th>No. de Cheque</th><th>Cuenta Presupuesto</th><th>Sub Cuenta Presupuesto</th>
+                        </tr>
+                </thead>
+                <tbody>
+                  {% for i in rfd_array1 %}
+		    {% if i %}
+                        <tr><!--{{i.first.id}}-->
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ i.first.doc_tipo.nombre|lower }}</td>
+                                <td>{{ i.first.doc_no|lower }}</td>
+                                <td>{{ i.first.doc_fecha|date:"d-m-Y" }}</td>
+                                <td>{{ i.first.doc_fecha_pago|date:"d-m-Y" }}</td>
+                                <td>{{ i.first.doc_detalle|lower }}</td>
+                                <td>{{ i.first.proveedor_rut }}</td>
+                                <td>{{ i.first.proveedor_nombre|lower }}</td>
+                                <td>{{ i.first.gasto }}</td>
+                                <td>{{ i.first.doc_monto }}</td>
+				<td>{{ i.first.doc_no_cheque }}</td>
+                                <td>{{ i.first.contabilidad.nombre|lower }}</td>
+                                <td>{{ i.first.contabilidad_hijo.nombre|lower }}</td>
+                        </tr>
+		    {% endif %}
+                  {% endfor %}
+			<tr><th colspan="8">Total:</th><td>{% if sum_cheque %}{{sum_cheque}}{%else%}0{%endif%}</td>
+                        </tr>
+                </tbody>
+          </table>
+
+	  <div class="break"></div>
+          <h4>Consolidado</h4>
+          <table class="table-bordered table-striped table-condensed">
+                <thead>
+                        <tr>
+                                <th>#</th>
+                                <th>Cuenta</th><th>Total por cuenta</th><th>Sub Cuenta</th><th>Total Efecivo</th>
+                                <th>Total Cheque</th><th>Total Subcuenta (cheque + efectivo)</th>
+                        </tr>
+                </thead>
+                <tbody>
+                  {% for i in rfd_array1 %}
+                    {% if i %}
+                        <tr><!--{{i.first.id}}-->
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ i.first.doc_tipo.nombre|lower }}</td>
+                                <td>{{ i.first.doc_no|lower }}</td>
+                                <td>{{ i.first.doc_fecha|date:"d-m-Y" }}</td>
+                                <td>{{ i.first.doc_fecha_pago|date:"d-m-Y" }}</td>
+                                <td>{{ i.first.doc_detalle|lower }}</td>
+                                <td>{{ i.first.proveedor_rut }}</td>
+                        </tr>
+                    {% endif %}
+                  {% endfor %}
+                </tbody>
+          </table>
+
+
+        </div>
+      {#% endblock %#}
+
+      {#% block menuright %#}
+        <div class="col-sm-2 sidenav">
+          <div class="well">
+            <p>ADS</p>
+          </div>
+          <div class="well">
+            <p>ADS</p>
+          </div>
+        </div>
+      {#% endblock %#}
+
+    {% endif %}
+  {% else %}
+    Usuario no registrado! 
+  {% endif %}
+
+{% endblock %}

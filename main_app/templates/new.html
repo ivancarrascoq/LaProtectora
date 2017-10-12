@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content%}
+  {% if user.is_authenticated %}<!--autenticado-->
+    {#% if user.is_superuser %#}<!--administrador-->
+<!--
+      {#% block menuleft %#}
+        <div class="col-sm-2 sidenav">
+          {% for i in context %}
+            <p><a class="rid" href="/rendicion/{{i.id}}">[{{i.id}}:{{i.user_id}}]</a></p>
+          {% endfor %}
+        </div >
+      {#% endblock %#}
+
+      {#% block content %#} 
+        <div class="col-sm-8 text-left" id="detalle">
+          <h1>Editar Rendicion</h1>
+          <p class="monto">{{ rendicion.monto}}</p>
+          <p>Lorem ipsu</p>
+          <hr>
+          <h3>Test</h3>
+          <p>Lorem ipsum...</p>             
+        </div>   
+      {#% endblock %#}
+
+      {#% block menuright %#}
+        <div class="col-sm-2 sidenav">
+          <div class="well">
+            <p>ADS</p>
+          </div>
+          <div class="well">
+            <p>ADS</p>
+          </div>
+        </div>
+      {#% endblock %#}
+-->
+    {#% else %#}<!--supervisor-->
+
+      {#% block menuleft %#}
+        <div class="col-sm-2 sidenav">
+          {% for i in context %}
+            <p><a class="rid" href="/rendicion/{{i.id}}">[{{i.id}}:{{i.user_id}}]</a></p>
+          {% endfor %}
+        </div >
+      {#% endblock %#}
+
+      {#% block content %#}
+      <div class="col-sm-8 text-left" id="detalle">
+          <h3>Crear nueva rendici&oacute;n</h3>
+          <!--info -->
+          <!--seccion1-->
+
+        <form class="form-horizontal" action="../post_rendicion" method="post">
+
+          {% csrf_token %}
+
+          <fieldset>
+          <legend>Secci&oacute;n I - Informaci&oacute;n General</legend>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="user_id">Nombre del Resposable</label>
+            <div class="col-sm-10">
+              <span class="form-control" style="background-color: #eee; opacity: 1;padding: 5px;">{{user}}</span>
+	      <input id="user_id" name="user_id" type="hidden" value="{{user.id}}" class="form-control" readonly>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="centro_costo">Centro de Costo</label>
+            <div class="col-sm-10">
+              <select id="centro_costo" name="centro_costo" class="form-control" required>
+                {% for i in centrocosto %}
+                  <option value={{i.id}}>{{ i.centro_costo.nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <!-- Select Basic -->
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="mes_gasto">Mes a Rendir / Reembolsar</label>
+            <div class="col-sm-10">
+              <select id="mes_gasto" name="mes_gasto" class="form-control" required>
+                {% for i in mes %}
+                  <option value={{ i }}>{{ i }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div> 
+
+          <!-- Text input-->
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="fecharendicion">Fecha Rendici&oacute;n / Reembolso</label>
+            <div class="col-sm-10">
+              <input id="fecharendicion" name="fecharendicion" type="date" placeholder="dd/mm/yyyy" class="form-control" required>
+            </div>
+          </div>
+
+          <!-- Select Basic -->
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="tipo_fondo">Fondo a Rendir - Tipo</label>
+            <div class="col-sm-10">
+              <select id="tipo_fondo" name="tipo_fondo" class="form-control" required>
+                {% for i in tipofondo %}
+                  <option value="{{i.id}}">{{i.nombre}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <!-- Select Basic -->
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="subvencion">Subvenci&oacute;n</label>
+            <div class="col-sm-10">
+              <select id="subvencion" name="subvencion" class="form-control" required>
+                {% for i in subvencion %}
+                <option value="{{i.id}}">{{i.nombre|title}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <!-- Text input-->
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="monto">Monto</label>
+            <div class="col-sm-10">
+              <input id="monto" name="monto" type="text" placeholder="$" class="form-control" value="0" required>
+            </div>
+          </div>
+          </fieldset>
+
+
+
+          <input type="submit" value="Siguiente" class="btn btn-primary"/>
+
+         <!--a class="btn btn-primary" role="button" href="/new/"><span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+         <!--end seccion1-->
+        </form>
+      <!--endinfo-->
+      </div>
+
+
+
+
+
+
+
+
+      {#% endblock %#}
+
+      {#% block menuright %#}
+        <div class="col-sm-2 sidenav">
+          <!--div class="well">
+            <p>ADS</p>
+          </div>
+          <div class="well">
+            <p>ADS</p>
+          </div-->
+        </div>
+      {#% endblock %#}
+
+    {#% endif %#}
+  {% else %}
+    Usuario no registrado! 
+  {% endif %}
+
+{% endblock %}

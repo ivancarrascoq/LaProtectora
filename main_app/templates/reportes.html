@@ -1,0 +1,525 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load humanize %}
+
+{% block content%}
+  {% if user.is_authenticated %}<!--autenticado-->
+
+  <!-- JS limit -->
+  <script>
+	$(function(){
+	    var fileInput = $('.fileup');
+	    var maxSize = fileInput.data('max-size');
+	    $('.upload-form').submit(function(e){
+	        if(fileInput.get(0).files.length){
+	            var fileSize = fileInput.get(0).files[0].size; // in bytes
+	            if(fileSize>maxSize){
+	                alert('El archivo supera el limite de 10 MB'); /* + maxSize + ' bytes');*/
+	                return false;
+	            }else{
+	               /* alert('file size is correct- '+fileSize+' bytes');*/
+	            }
+	        }else{
+	            /*alert('choose file, please');*/
+	            return false;
+	        }
+	        
+	    });
+	});
+  </script>
+
+    {%if user.is_superuser %}<!--administrador-->
+
+      <!--###################################-reports admin-##################################-->
+
+
+      {#% block menuleft %#}
+        <div class="col-sm-1 sidenav">
+          <!--p><span class="titulo-sidenav">Rendiciones cerradas</span></p>
+          {% for i in rall %}
+            {% if rid.id == i.id %}
+            <p><a class="rid active" href="javascript:void(0);">{{forloop.counter}}. {{i.subvencion.nombre|upper|slice:":3"}} {{i.mes_gasto|title|slice:":3"}}-{{i.fecha_subida|date:"Y"}} ({{i.id}})<-{{i.user_id}}]-></a></p>
+            {% else %}
+            <p><a class="rid" href="/reportes/{{i.id}}">{{forloop.counter}}. {{i.subvencion.nombre|upper|slice:":3"}} {{i.mes_gasto|title|slice:":3"}}-{{i.fecha_subida|date:"Y"}} ({{i.id}})<!-{{i.user_id}}]-></a></p>
+            {% endif %}
+          {% endfor %}
+	  -->
+        </div>
+      {#% endblock %#}
+
+      {#% block content %#}
+        <div class="col-sm-11 text-left" id="detalle">
+    {% if rid != None %}
+          <h2>Portal de Reportes <button id="print-button" onclick="myFunction()" class="btn btn-success">Imprimir</button>
+		<a href="/open_rendicion/{{rid.id}}" type="button" class="btn btn-primary btn">
+                  Volver a Abrir
+                </a> 
+	  </h2> 
+          <!--div class="col-md-12"-->
+                <div class="panel panel-group panel-default">
+                      <div class="panel-heading"><h3>Rendici&oacute;n No. {{rid.id}} - Creada por {{rid.user.username}}</h3></div>
+                </div>
+        <style>
+        @media print {
+          body {font-size: 10px;}
+          h4 {font-size: 12px;}
+          @page {size: landscape;}
+          #print-button{display:none;}
+          .break {page-break-after: always;}
+          .print-hidden {display:block;}
+          .btn {display:none;}
+        }
+        .nobr { white-space: nowrap; text-align:right; }
+        .print-hidden {display:none;}
+        </style>
+        <script>
+
+        function myFunction() {
+             var printContents = document.getElementById('detalle').innerHTML;
+             var originalContents = document.body.innerHTML;
+             document.body.innerHTML = printContents;
+             window.print();
+             document.body.innerHTML = originalContents;
+        }
+        </script><br/>
+          <table class="table-bordered table-striped table-condensed reportes">
+            <tr><th>Centro de Costo</th><td>{{rid.centro_costo.nombre}}</td></tr>
+            <tr><th>Mes a Rendir</th><td>{{rid.mes_gasto}}</td></tr>
+            <tr><th>Fondo a Rendir</th><td>{{rid.tipo_fondo.nombre}}</td></tr>
+            <tr><th>Subvenci&oacute;n</th><td>{{rid.subvencion.nombre}}</td></tr>
+            <tr><th>Monto Solicitado</th><td class="nobr">$ {{rid.monto|intcomma}}</td></tr>
+            <tr><th>Monto Gastado (Efectivo + Cheque)</th><td class="nobr">$ {{sum_cheque_efectivo|intcomma}}</td></tr>
+            <tr><th>Saldo (Monto Solicitado - Monto Gastado)</th><td class="nobr">$ {%if sum_dev%}{{sum_dev|intcomma}}{%else%}0{%endif%}</td></tr>
+          </table>
+
+          <h4>Devoluci&oacute;n</h4>
+          <table class="table-bordered table-striped table-condensed reportes">
+                <thead>
+                        <tr>
+                                <th>#</th><th>Concepto (por que no se gasto)</th><th>Deposito No.</th><th>Fecha</th><th>Monto</th>
+                        </tr>
+                </thead>
+                <tbody>
+                  {% for i in rgd_array %}
+                    {% if i %}
+                        <tr><!--{{i.first.id}}-->
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ i.first.detalle|lower }}</td>
+                                <td>{{ i.first.deposito_no|lower }}</td>
+                                <td class="nobr">{{ i.first.fecha|date:"d-m-Y" }}</td>
+                                <td class="nobr">$ {{ i.first.monto|intcomma }}</td>
+                        </tr>
+                    {% endif %}
+                  {% endfor %}
+                        <tr><th colspan="4">Total:</th><td>$ {%if sum_dev%}{{sum_dev|intcomma}}{%else%}0{%endif%}</td>
+                        </tr>
+                </tbody>
+          </table>
+
+          <hr/>
+          <div class="break"></div><br class="print-hidden"/>
+          <h4>Detalle Efectivo</h4>
+          <table class="table-bordered table-striped table-condensed reportes">
+                <thead>
+                        <tr>
+                                <th>#</th>
+                                <th>Tipo de Documento</th><th>No documento</th><th>Fecha documento</th><th>Fecha de Pago</th>
+                                <th>Descripci&oacute;n del Gasto</th><th>Rut Proveedor</th><th>Nombre Proveedor</th><th>Monto Gasto</th>
+                                <th>Monto Documento</th><th>Cuenta Presupuesto</th><th>Sub Cuenta Presupuesto</th>
+                        </tr>
+                </thead>
+                <tbody>
+                  {% for i in rfd_array0 %}
+                    {% if i %}
+                        <tr><!--{{i.first.id}}-->
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ i.first.doc_tipo.nombre|lower }}</td>
+                                <td>{{ i.first.doc_no|lower }}</td>
+                                <td class="nobr">{{ i.first.doc_fecha|date:"d-m-Y" }}</td>
+                                <td class="nobr">{{ i.first.doc_fecha_pago|date:"d-m-Y" }}</td>
+                                <td>{{ i.first.doc_detalle|lower }}</td>
+                                <td class="nobr">{{ i.first.proveedor_rut }}</td>
+                                <td>{{ i.first.proveedor_nombre|lower }}</td>
+                                <td class="nobr">$ {{ i.first.gasto|intcomma }}</td>
+                                <td class="nobr">$ {{ i.first.doc_monto|intcomma }}</td>
+                                <td>{{ i.first.contabilidad.nombre|lower }}</td>
+                                <td>{{ i.first.contabilidad_hijo.nombre|lower }}</td>
+                        </tr>
+                    {% endif %}
+                  {% endfor %}
+                        <tr><th colspan="8">Total:</th><td class="nobr">$ {% if sum_efectivo %}{{sum_efectivo|intcomma}}{%else%}0{%endif%}</td>
+                        </tr>
+                </tbody>
+          </table>
+          <div class="break"></div><br class="print-hidden"/>
+          <h4>Detalle Cheque</h4>
+          <table class="table-bordered table-striped table-condensed reportes">
+                <thead>
+                        <tr>
+                                <th>#</th>
+                                <th>Tipo de Documento</th><th>No documento</th><th>Fecha documento</th><th>Fecha de Pago</th>
+                                <th>Descripci&oacute;n del Gasto</th><th>Rut Proveedor</th><th>Nombre Proveedor</th><th>Monto Gasto</th>
+                                <th>Monto Documento</th><th>No. de Cheque</th><th>Cuenta Presupuesto</th><th>Sub Cuenta Presupuesto</th>
+                        </tr>
+                </thead>
+                <tbody>
+                  {% for i in rfd_array1 %}
+                    {% if i %}
+                        <tr><!--{{i.first.id}}-->
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ i.first.doc_tipo.nombre|lower }}</td>
+                                <td>{{ i.first.doc_no|lower }}</td>
+                                <td class="nobr">{{ i.first.doc_fecha|date:"d-m-Y" }}</td>
+                                <td class="nobr">{{ i.first.doc_fecha_pago|date:"d-m-Y" }}</td>
+                                <td>{{ i.first.doc_detalle|lower }}</td>
+                                <td class="nobr">{{ i.first.proveedor_rut }}</td>
+                                <td>{{ i.first.proveedor_nombre|lower }}</td>
+                                <td class="nobr">$ {{ i.first.gasto|intcomma }}</td>
+                                <td class="nobr">$ {{ i.first.doc_monto|intcomma }}</td>
+                                <td class="nobr">{{ i.first.doc_no_cheque }}</td>
+                                <td>{{ i.first.contabilidad.nombre|lower }}</td>
+                                <td>{{ i.first.contabilidad_hijo.nombre|lower }}</td>
+                        </tr>
+                    {% endif %}
+                  {% endfor %}
+                        <tr><th colspan="8">Total:</th><td class="nobr">$ {% if sum_cheque %}{{sum_cheque|intcomma}}{%else%}0{%endif%}</td>
+                        </tr>
+                </tbody>
+          </table>
+
+          <div class="break"></div><br class="print-hidden"/>
+          <h4>Consolidado</h4>
+          <table class="table-bordered table-striped table-condensed reportes">
+                <thead>
+                        <tr>
+                                <th>#</th>
+                                <th>Cuenta</th><th>Total por cuenta</th><th>Sub Cuenta</th><th>Total Efectivo</th>
+                                <th>Total Cheque</th><th>Total Subcuenta (cheque + efectivo)</th>
+                        </tr>
+                </thead>
+                <tbody>
+                        {% for i in c_array2 %}
+                        <tr>
+                                <td>{{ forloop.counter }}</td>
+                                {% if i.8 != 0 %}<td rowspan="{{i.8}}">{#{i.0}#}{{i.6.nombre}}</td>{% endif %}
+                                {% if i.8 != 0 %}<td rowspan="{{i.8}}" class="nobr">$ {{i.1|intcomma}}</td>{% endif %}
+                                <td>{#{i.2}#}{{i.7.nombre}}</td>
+                                <td class="nobr">$ {{i.4|intcomma}}</td>
+                                <td class="nobr">$ {{i.3|intcomma}}</td>
+                                <td class="nobr">$ {{i.5|intcomma}}</td>
+                        </tr>
+                        {% endfor %}
+                </tbody>
+          </table>
+
+      <!--upload admin-->
+
+          <br/><br/><br/>
+          {% if url_upload %}
+            <a href="{% url 'index' %}{{url_upload}}" target="_blank" onclick="return popitup(this)">
+              <img class="profile-img" src="{% static 'file-checked.png' %}" alt="Documentos rendici&oacute;n" style="padding-bottom: 10px;"/> {{name_upload}}
+            </a>
+          {% else %}
+            <h4>No hay archivos asociados a esta rendici&oacute;n.</h4>
+          {% endif %}
+
+	  {% if user.id == rid.user_id %}
+            <form method="post" class="upload-form" enctype="multipart/form-data" action="{% url 'post_upload' %}" onSubmit="if(document.getElementById('fileup').value == '') return false;">
+              {% csrf_token %}
+              <input type="hidden" name="rid" value="{{rid.id}}" />
+              <input id="fileup" class="fileup" type="file" name="myfile" accept=".pdf,image/*" data-max-size="10000000" /><br/>
+              <span style="font-size:12px;"><p style="width:50%;"><i>
+                El archivo debe tener extensi&oacute;n .pdf o cualquier tipo de archivo imagen. 
+                &Eacute;ste no debe ser mayor a 10MB.  Cada vez que suba un archivo, se borrar&aacute; 
+                el archivo anterior y lo almacenar&aacute; con el nombre de la rendici&oacute;n y la 
+                extensi&oacute;n del documento que ha subido.</i></p></span><br/>
+              <button type="submit" class="fd btn btn-primary">Subir Archivo</button>
+            </form>
+	  {% else %}
+	    <h4 class="alert alert-danger">No tiene permisos suficientes para adjuntar/modificar documentos.</h4>
+	  {% endif %}
+
+          <script>
+            function popitup(link) {
+              var w = window.open(link.href,
+                link.target||"_blank",
+                'menubar=no,toolbar=no,location=no,directories=no,status=no,scrollbars=yes,resizable=no,dependent,width=800,height=620,left=0,top=0');
+              return w?false:true; // allow the link to work if popup is blocked
+            }
+          </script>
+
+
+
+
+      {% else %}
+          <h2>Reportes</h2><br/>
+          <p>Seleccione una rendici&oacute;n para obtener un reporte</p>
+      {% endif %} 
+        </div>
+
+
+
+      <!--###################################-reports admin-##################################-->
+
+    {% else %}<!--supervisor-->
+
+
+      {#% block menuleft %#}
+        <div class="col-sm-1 sidenav">
+          <p><span class="titulo-sidenav">Rendiciones cerradas</span></p>
+	  <!--h4>Rendiciones Cerradas</h4-->
+          {% for i in rall %}
+	    {% if rid.id == i.id %}
+            <p><a class="rid active" href="javascript:void(0);">{{forloop.counter}}. {{i.subvencion.nombre|upper|slice:":3"}} {{i.mes_gasto|title|slice:":3"}}-{{i.fecha_subida|date:"Y"}} ({{i.id}})<!--{{i.user_id}}]--></a></p>
+	    {% else %}
+	    <p><a class="rid" href="/reportes/{{i.id}}">{{forloop.counter}}. {{i.subvencion.nombre|upper|slice:":3"}} {{i.mes_gasto|title|slice:":3"}}-{{i.fecha_subida|date:"Y"}} ({{i.id}})<!--{{i.user_id}}]--></a></p>
+	    {% endif %}
+          {% endfor %}
+        </div >
+      {#% endblock %#}
+
+      {#% block content %#}
+        <div class="col-sm-11 text-left" id="detalle">
+	{% if rid != None %}
+          <h2>Portal de Reportes <button id="print-button" onclick="myFunction()" class="btn btn-success">Imprimir</button></h2> 
+          <!--div class="col-md-12"-->
+                <div class="panel panel-group panel-default">
+                      <div class="panel-heading"><h3>Rendici&oacute;n No. {{rid.id}}</h3></div>
+                </div>
+          <!--/div-->
+          <!--p class="monto">
+          <a class="btn btn-primary" role="button" href="/new/"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Crear</a>
+          </p><p></p><hr><h3>Reportes</h3>
+          <p>Reportes para areas contables Cheque / Efectivo</p>
+          <p class="monto"><a class="btn btn-success" role="button" href="/reportes/">Acceder</a>
+          </p-->
+
+
+	<!--button id="print-button" onclick="myFunction()" class="btn btn-success">Imprimir</button-->
+	<style>
+	@media print {
+  	  body {font-size: 10px;}
+	  h4 {font-size: 12px;}
+	  @page {size: landscape;}
+	  #print-button{display:none;}
+	  .break {page-break-after: always;}
+	  .print-hidden {display:block;}
+          .btn {display:none;}
+	}
+        .nobr { white-space: nowrap; text-align:right; }
+	.print-hidden {display:none;}
+	</style>
+	<script>
+	/*function myFunction() {
+	    window.print();
+	}*/
+
+
+	function myFunction() {
+	     var printContents = document.getElementById('detalle').innerHTML;
+	     var originalContents = document.body.innerHTML;
+	     document.body.innerHTML = printContents;
+	     window.print();
+	     document.body.innerHTML = originalContents;
+	}
+	</script><br/>
+
+
+	  <table class="table-bordered table-striped table-condensed reportes">
+            <tr><th>Centro de Costo</th><td>{{rid.centro_costo.nombre}}</td></tr>
+	    <tr><th>Mes a rendir</th><td>{{rid.mes_gasto}}</td></tr>
+	    <tr><th>Fondo a Rendir</th><td>{{rid.tipo_fondo.nombre}}</td></tr>
+            <tr><th>Subvenci&oacute;n</th><td>{{rid.subvencion.nombre}}</td></tr>
+            <tr><th>Monto Solicitado</th><td class="nobr">$ {{rid.monto|intcomma}}</td></tr>
+            <tr><th>Monto Gastado (Efectivo + Cheque)</th><td class="nobr">$ {{sum_cheque_efectivo|intcomma}}</td></tr>
+            <tr><th>Saldo (Monto Solicitado - Monto Gastado)</th><td class="nobr">$ {%if sum_dev%}{{sum_dev|intcomma}}{%else%}0{%endif%}</td></tr>
+          </table>
+
+	  <h4>Devoluci&oacute;n</h4>
+          <table class="table-bordered table-striped table-condensed reportes">
+                <thead>
+                        <tr>
+                                <th>#</th><th>Concepto (por que no se gasto)</th><th>Deposito No.</th><th>Fecha</th><th>Monto</th>
+                        </tr>
+                </thead>
+                <tbody>
+                  {% for i in rgd_array %}
+                    {% if i %}
+                        <tr><!--{{i.first.id}}-->
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ i.first.detalle|lower }}</td>
+                                <td>{{ i.first.deposito_no|lower }}</td>
+                                <td class="nobr">{{ i.first.fecha|date:"d-m-Y" }}</td>
+                                <td class="nobr">$ {{ i.first.monto|intcomma }}</td>
+                        </tr>
+                    {% endif %}
+                  {% endfor %}
+		        <tr><th colspan="4">Total:</th><td>$ {%if sum_dev%}{{sum_dev|intcomma}}{%else%}0{%endif%}</td>
+			</tr>
+                </tbody>
+          </table>
+
+          <hr/>
+	  <div class="break"></div><br class="print-hidden"/>
+          <h4>Detalle Efectivo</h4>
+	  <table class="table-bordered table-striped table-condensed reportes">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Tipo de Documento</th><th>No documento</th><th>Fecha documento</th><th>Fecha de Pago</th>
+				<th>Descripci&oacute;n del Gasto</th><th>Rut Proveedor</th><th>Nombre Proveedor</th><th>Monto Gasto</th>
+				<th>Monto Documento</th><th>Cuenta Presupuesto</th><th>Sub Cuenta Presupuesto</th>
+			</tr>
+		</thead>
+		<tbody>
+		  {% for i in rfd_array0 %}
+		    {% if i %}
+			<tr><!--{{i.first.id}}-->
+				<td>{{ forloop.counter }}</td>
+				<td>{{ i.first.doc_tipo.nombre|lower }}</td>
+				<td>{{ i.first.doc_no|lower }}</td>
+                                <td class="nobr">{{ i.first.doc_fecha|date:"d-m-Y" }}</td>
+                                <td class="nobr">{{ i.first.doc_fecha_pago|date:"d-m-Y" }}</td>
+                                <td>{{ i.first.doc_detalle|lower }}</td>
+                                <td class="nobr">{{ i.first.proveedor_rut }}</td>
+                                <td>{{ i.first.proveedor_nombre|lower }}</td>
+                                <td class="nobr">$ {{ i.first.gasto|intcomma }}</td>
+                                <td class="nobr">$ {{ i.first.doc_monto|intcomma }}</td>
+                                <td>{{ i.first.contabilidad.nombre|lower }}</td>
+                                <td>{{ i.first.contabilidad_hijo.nombre|lower }}</td>
+			</tr>
+		    {% endif %}
+		  {% endfor %}
+			<tr><th colspan="8">Total:</th><td class="nobr">$ {% if sum_efectivo %}{{sum_efectivo|intcomma}}{%else%}0{%endif%}</td>
+                        </tr>
+		</tbody>
+	  </table>
+ 	  <div class="break"></div><br class="print-hidden"/>
+          <h4>Detalle Cheque</h4>
+          <table class="table-bordered table-striped table-condensed reportes">
+                <thead>
+                        <tr>
+                                <th>#</th>
+                                <th>Tipo de Documento</th><th>No documento</th><th>Fecha documento</th><th>Fecha de Pago</th>
+                                <th>Descripci&oacute;n del Gasto</th><th>Rut Proveedor</th><th>Nombre Proveedor</th><th>Monto Gasto</th>
+                                <th>Monto Documento</th><th>No. de Cheque</th><th>Cuenta Presupuesto</th><th>Sub Cuenta Presupuesto</th>
+                        </tr>
+                </thead>
+                <tbody>
+                  {% for i in rfd_array1 %}
+		    {% if i %}
+                        <tr><!--{{i.first.id}}-->
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ i.first.doc_tipo.nombre|lower }}</td>
+                                <td>{{ i.first.doc_no|lower }}</td>
+                                <td class="nobr">{{ i.first.doc_fecha|date:"d-m-Y" }}</td>
+                                <td class="nobr">{{ i.first.doc_fecha_pago|date:"d-m-Y" }}</td>
+                                <td>{{ i.first.doc_detalle|lower }}</td>
+                                <td class="nobr">{{ i.first.proveedor_rut }}</td>
+                                <td>{{ i.first.proveedor_nombre|lower }}</td>
+                                <td class="nobr">$ {{ i.first.gasto|intcomma }}</td>
+                                <td class="nobr">$ {{ i.first.doc_monto|intcomma }}</td>
+				<td class="nobr">{{ i.first.doc_no_cheque }}</td>
+                                <td>{{ i.first.contabilidad.nombre|lower }}</td>
+                                <td>{{ i.first.contabilidad_hijo.nombre|lower }}</td>
+                        </tr>
+		    {% endif %}
+                  {% endfor %}
+			<tr><th colspan="8">Total:</th><td class="nobr">$ {% if sum_cheque %}{{sum_cheque|intcomma}}{%else%}0{%endif%}</td>
+                        </tr>
+                </tbody>
+          </table>
+
+	  <div class="break"></div><br class="print-hidden"/>
+          <h4>Consolidado</h4>
+          <table class="table-bordered table-striped table-condensed reportes">
+                <thead>
+                        <tr>
+                                <th>#</th>
+                                <th>Cuenta</th><th>Total por cuenta</th><th>Sub Cuenta</th><th>Total Efectivo</th>
+                                <th>Total Cheque</th><th>Total Subcuenta (cheque + efectivo)</th>
+                        </tr>
+                </thead>
+                <tbody>
+			{% for i in c_array2 %}
+			<tr>
+				<td>{{ forloop.counter }}</td>
+				{% if i.8 != 0 %}<td rowspan="{{i.8}}">{#{i.0}#}{{i.6.nombre}}</td>{% endif %}
+				{% if i.8 != 0 %}<td rowspan="{{i.8}}" class="nobr">$ {{i.1|intcomma}}</td>{% endif %}
+				<td>{#{i.2}#}{{i.7.nombre}}</td>
+				<td class="nobr">$ {{i.4|intcomma}}</td>
+				<td class="nobr">$ {{i.3|intcomma}}</td>
+				<td class="nobr">$ {{i.5|intcomma}}</td>
+			</tr>
+			{% endfor %}
+                  <!--{% for i in c_array %}
+                    {% if i %}
+                        <tr><{#{i.first.id}#}
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ i.1|lower }}</td>
+                                <td>{{ i.2 }}</td>
+                                <td>{{ i.4|lower }}</td>
+				
+                                <td>{{ i.5 }}</td>
+                                <td>{{ i.7 }}</td>
+				
+                                <td>{{ i.6 }}</td>
+                        </tr>
+                    {% endif %}
+                  {% endfor %}-->
+                </tbody>
+          </table>
+
+      <!--upload supervisor-->
+	  <br/><br/><br/>
+          {% if url_upload %}
+	    <a href="{% url 'index' %}{{url_upload}}" target="_blank" onclick="return popitup(this)">
+	      <img class="profile-img" src="{% static 'file-checked.png' %}" alt="Documentos rendici&oacute;n" style="padding-bottom: 10px;"/> {{name_upload}}
+	    </a>
+	  {% else %}
+	    <h4>No hay archivos asociados a esta rendici&oacute;n.</h4>
+          {% endif %}
+	  <form method="post" class="upload-form" enctype="multipart/form-data" action="{% url 'post_upload' %}" onSubmit="if(document.getElementById('fileup').value == '') return false;">
+	    {% csrf_token %}
+            <input type="hidden" name="rid" value="{{rid.id}}" />
+	    <input id="fileup" class="fileup" type="file" name="myfile" accept=".pdf,image/*" data-max-size="10000000" /><br/>
+	      <span style="font-size:12px;"><p style="width:50%;"><i>
+                El archivo debe tener extensi&oacute;n .pdf o cualquier tipo de archivo imagen.
+                &Eacute;ste no debe ser mayor a 10MB.  Cada vez que suba un archivo, se borrar&aacute;
+                el archivo anterior y lo almacenar&aacute; con el nombre de la rendici&oacute;n y la
+                extensi&oacute;n del documento que ha subido.</i></p></span><br/>
+	    <button type="submit" class="fd btn btn-primary">Subir Archivo</button>
+	  </form>
+	  <script>
+	    function popitup(link) {
+	      var w = window.open(link.href,
+	        link.target||"_blank",
+	        'menubar=no,toolbar=no,location=no,directories=no,status=no,scrollbars=yes,resizable=no,dependent,width=800,height=620,left=0,top=0');
+	      return w?false:true; // allow the link to work if popup is blocked
+	    }
+	  </script>
+
+      {% else %}
+          <h2>Reportes</h2><br/>
+	  <p>Seleccione una rendici&oacute;n para obtener un reporte</p>
+      {% endif %} 
+        </div>
+      {#% endblock %#}
+
+      {#% block menuright %#}
+        <!--div class="col-sm-1 sidenav">
+          <div class="well">
+            <p>ADS</p>
+          </div>
+          <div class="well">
+            <p>ADS</p>
+          </div>
+        </div-->
+      {#% endblock %#}
+
+    {% endif %}
+  {% else %}
+    Usuario no registrado! 
+  {% endif %}
+
+{% endblock %}

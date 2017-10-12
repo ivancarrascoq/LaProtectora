@@ -1,0 +1,155 @@
+html {height: 100%;}
+.navbar-inverse2 {background-color: #edebf5;}
+div.container-fluid {height:100%; /*background-color:#edebf5;*/ }
+
+a.active {font-weight: bold; text-decoration:underline;}
+
+.panel-heading {    padding: 1px 15px;}
+.panel-body {    padding: 0px 15px;}
+
+/*.gradiente {
+    background: radial-gradient(ellipse 75em 55em at top, #F44336, #ee0979);
+    margin-bottom: 0;
+    border-radius: 0;
+
+}
+.navbar-brand,navbar-nav {
+    color: white;
+}
+*/
+
+.navbar-inverse2 {background-color: #edebf5; color: #545355; }
+
+/* Remove the navbar's default margin-bottom and rounded borders */
+.navbar {
+	margin-bottom: 0;
+	border-radius: 0;
+	}
+
+/* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+.row.content {height: 100%;/*750px*/}
+
+/* Set gray background color and 100% height */
+.sidenav {
+    padding-top: 40px;
+    background-color: #edebf5;
+    height: 100%;
+    height: -webkit-calc(100vh - 122px);
+    height: -moz-calc(100vh - 122px);
+    height: calc(100vh - 122px);
+    font-size: 12px;
+    }
+.titulo-sidenav {
+    color: #337ab7;
+    /* border-bottom: 1px solid; */
+    font-size: 15px;
+    font-weight: bold;}
+
+/* Set black background color, white text and some padding */
+
+
+body {/*position: relative;*/padding-bottom: 60px;}
+
+footer {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 15px;
+  background-color: #191919;
+  color: white;
+  text-align: center;
+  height: 60px;
+}
+
+div.col-md-11, div.col-sm-11 {padding-bottom:20px; background-color: white; min-height:700px;}
+
+    /* On small screens, set height to 'auto' for sidenav and grid */
+@media screen and (max-width: 767px) {
+    .sidenav {
+        	height: auto;
+     		padding: 15px;
+            }
+      .row.content {height:auto;}
+    }
+
+#centro_costo, #mes_gasto, #tipo_fondo, #subvencion {text-transform: capitalize;}
+
+.table>tbody>tr>td, .table>tbody>tr>th {padding: 0px;}
+
+.form-control {padding: 0px; border-radius:6px;}
+
+.tablefd {
+    display: block;
+    overflow-x: auto;
+/*    background-color: #0081c6;*/
+    border-radius: 5px;
+    padding: 0 0px 16px 5px;
+}
+.tablegd {
+    display: block;
+    overflow-x: auto;
+/*    background-color: #ef4728;*/
+    border-radius: 5px;
+    padding: 10px 0px 16px 5px;
+/*    width: 1160px;*/
+}
+.tablegd input#detalle {width: 600px;}
+
+td {
+    padding: 1px;
+}
+th {
+/*    color: white;*/
+}
+
+/*td .glyphicon { color: white;}*/
+
+table.reportes th {color: #333333;}
+
+#cheque,#doc_no_cheque, #proveedor_rut {width: 100px;}
+
+#proveedor_nombre, #doc_monto, #gasto {width: 150px;}
+
+#doc_tipo_id, #doc_no, #doc_detalle, #contabilidad_id, #contabilidad_hijo_id {width: 200px;}
+
+#categoria_id, #subcategoria_id {width:300px}
+
+form input[type="text"] {text-transform: lowercase;} 
+
+.anuncio {position: absolute;z-index: 10;/*top: 12px;left: 500px;*/display: none;}
+
+.img-responsive {
+    height: 316%;
+    margin-top: -15px;
+}
+
+
+div>p {
+    margin: 0 0 10px;
+    text-align: left;
+    /*line-height: 15px;*/
+}
+
+p>a.btn-success, p>a.btn-primary {padding: 20px 74px; margin-top: 50px; font-size:16px;}
+p>a.btn-success { /*width: 235px;*/ padding: 20px 64px;}
+.info-index {padding: 0px 15px; margin-top: 20px; max-width: 400px;}
+.boton-index {margin-right: 65px;}
+
+.modal-body {font-size: 18px;}
+
+/*paginate*/ 
+.pagination li {
+    display:inline-block;
+    padding:5px;
+}  
+ul.list>li {
+    list-style: none;
+    margin-bottom: 5px;
+}
+input.search {
+  border:solid 1px #ccc;
+  border-radius: 5px;
+  padding:5px 14px;
+  margin-bottom:10px
+}

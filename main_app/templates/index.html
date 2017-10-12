@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content%}
+  {% if user.is_authenticated %}<!--autenticado-->
+    {% if user.is_superuser %}<!--administrador-->
+
+      {#% block menuleft %#}
+        <div class="col-sm-2 sidenav">
+          {#% for i in context %#}
+            <!--p><a class="rid" href="/rendicion/{{i.id}}">
+		{#{i.id}#}{#{i.user.first_name}#}
+		{{i.user.username}} - {{i.mes_gasto|title|slice:":3"}}-{{i.fecha_subida|date:"Y"}} ({{i.id}})
+	    </a></p-->
+          {#% endfor %#}
+        </div >
+      {#% endblock %#}
+
+      {#% block content %#} 
+       <div class="col-sm-8">
+         <div class="col-sm-6 text-left" id="detalle">
+           <h1>Rendiciones en proceso</h1>
+           <div id="list-rall">
+             Buscar: <input type="text" class="search"/>
+             <ul class="list">
+               {% for i in context %}
+                 <!--p class="name"-->
+                   <li><a class="rid" href="/rendicion/{{i.id}}">
+                     {#{i.id}#}{#{i.user.first_name}#}
+ 		     {{forloop.counter}}.
+                     {{i.user.username}} - {{i.subvencion.nombre|upper|slice:":3"}} {{i.mes_gasto|title|slice:":3"}}-{{i.fecha_subida|date:"Y"}} ({{i.id}})
+                   </a></li>
+                 <!--/p-->
+               {% endfor %}
+             </ul>
+	     <ul class="pagination"></ul>
+           </div>
+	   <script>
+	     var monkeyList = new List('list-rall', {
+	       valueNames: ['rid'],
+	       page: 10,
+	       pagination: true
+	     });
+	   </script>
+	 </div>
+
+
+         <div class="col-sm-6 text-left" id="detalle">
+           <h1>Rendiciones cerradas</h1>
+           <div id="list-rall_c">
+             Buscar: <input type="text" class="search"/>
+	     <ul class="list">
+               {% for i in r_close %}
+  	         <!--p-->
+		 <li>
+		   <a class="rid" href="/reportes/{{i.id}}">
+	  	   {{forloop.counter}}.
+		   {{i.user.username}} - {{i.subvencion.nombre|upper|slice:":3"}} {{i.mes_gasto|title|slice:":3"}}-{{i.fecha_subida|date:"Y"}} ({{i.id}})
+	           </a>
+		 </li>
+               {% endfor %}
+	     </ul>
+             <ul class="pagination"></ul>
+           </div>
+           <script>
+             var monkeyList = new List('list-rall_c', {
+               valueNames: ['rid'],
+               page: 10, 
+               pagination: true
+             });      
+           </script>
+         </div>
+
+
+         <div class="col-sm-12">
+	   <hr/>
+           <div class="col-md-3 boton-index">
+             <p>
+               <a class="btn btn-primary" role="button" href="/new/"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Crear</a>
+             </p>
+           </div>
+           <div class="col-md-5 info-index" style="text-align:left;">
+             <h3>Crear nueva rendici&oacute;n</h3>
+             Esta secci&oacute;n le permite comenzar su trabajo de rendici&oacute;n e ir guardando su avance.
+           </div>
+	   <div style="clear:both;"></div>
+             <hr/>
+              <h1>Reportes Superintendencia</h1>
+		<form class="form-horizontal" action="../post_filter" method="post">
+	          {% csrf_token %}
+		  <table class="table-condensed">
+		    <thead>
+		      <tr>
+		        <th>Fecha Inicio</th>
+		        <th>Fecha T&eacute;rmino</th>
+		        <th>Centro de Costo</th>
+		        <th>Subvenci&oacute;n</th>
+		        <th><!--operador--></th>
+		      </tr>
+		    </thead>
+		    <tbody>
+		      <tr>
+		        <td><input id="f_date_s" name="f_date_s" type="date" placeholder="dd/mm/yyyy" class="form-control" required></td>
+		        <td><input id="f_date_f" name="f_date_f" type="date" placeholder="dd/mm/yyyy" class="form-control" required></td>
+		        <td><select id="f_cc" name="f_cc" class="form-control" required>                  
+                          <option selected></option>
+			  <option value="1,2,3,4">TODOS</option>
+                	  {% for i in centrocosto %}
+			    {% if user.id == 1 %}
+                	      <option value="{{i.id}}">{{ i.nombre }}</option>
+			    {%else%}
+			      <option value="{{i.centro_costo_id}}">{{i.centro_costo.nombre}}</option>
+			    {%endif%}
+                	  {% endfor %}
+                	  </select>
+		        </td>
+		        <td><select id="f_sub" name="f_sub" class="form-control" required>
+			  <option selected></option>
+			  <option value="1,2,3,4,5,6">TODOS</option>
+                	  {% for i in subvencion %}               
+                	  <option value="{{i.id}}">{{i.nombre|title}}</option>
+                	  {% endfor %}         
+              		  </select>
+		        </td>
+		        <td><input type="submit" value="Generar" class="btn btn-primary"/></td>
+		      </tr>
+		    </tbody>
+		  </table>
+		</form>
+	       <style>
+		#f_date_s,#f_date_f, #f_cc,#f_sub {width: 150px;}
+		.filter {width: 150px;}
+	       </style>
+               <script>
+                $(document.body).on('change','#f_date_s', function() {
+                    var fecha = $('#f_date_s').val();
+                    $('#f_date_f').val(fecha);
+                    $('#f_date_f').attr("min",fecha);
+                });
+               </script> 
+         </div>
+
+
+       </div>
+      {#% endblock %#}
+
+      {#% block menuright %#}
+        <div class="col-sm-2 sidenav">
+          <!--div class="well">
+            <p>ADS</p>
+          </div>
+          <div class="well">
+            <p>ADS</p>
+          </div-->
+        </div>
+      {#% endblock %#}
+
+    {% else %}<!--supervisor-->
+
+      {#% block menuleft %#}
+        <div class="col-md-1 sidenav">
+          <p><span class="titulo-sidenav">Rendiciones Pendientes</span></p>
+	  <!--h4>Editar Rendiciones</h4-->
+          {% for i in context %}
+	    <p>
+	    {#% if i.locked == 0 %#}
+              <a class="rid" href="/rendicion/{{i.id}}">{{forloop.counter}}. {{i.subvencion.nombre|upper|slice:":3"}} {{i.mes_gasto|title|slice:":3"}}-{{i.fecha_subida|date:"Y"}} ({{i.id}})<!--{{i.user_id}}]--></a>
+            {#% else %#}
+              <!--a class="rid" href="/reportes/{{i.id}}" style="color: #337ab7;text-decoration: none;"><i class="fa fa-lock" aria-hidden="true"></i>{{i.subvencion.nombre|upper|slice:":3"}} {{i.mes_gasto|title|slice:":3"}}-{{i.fecha_subida|date:"Y"}} ({{i.id}}) </a-->
+	      <!--javascript:void(0); -->
+            {#% endif %#}
+          {% endfor %}
+	  </p>
+	  <p><span class="titulo-sidenav">Rendiciones Cerradas</span></p>
+          {% for i in r_close %}
+          <p>
+	    <a class="rid" href="/reportes/{{i.id}}" style="color: #337ab7;text-decoration: none;">{{forloop.counter}}. <i class="fa fa-lock" aria-hidden="true"></i> {{i.subvencion.nombre|upper|slice:":3"}} {{i.mes_gasto|title|slice:":3"}}-{{i.fecha_subida|date:"Y"}} ({{i.id}}) </a>
+          </p>
+          {% endfor %}
+        </div >
+      {#% endblock %#}
+
+      {#% block content %#}
+        <div class="col-sm-11 text-left" id="detalle" style="padding-left: 80px;">
+          <div class="col-sm-3 boton-index">
+            <p>
+              <a class="btn btn-primary" role="button" href="/new/"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Crear</a>
+            </p>
+          </div>
+          <div class="col-sm-5 info-index">
+            <h3>Crear nueva rendici&oacute;n</h3>
+            Esta secci&oacute;n le permite comenzar su trabajo de rendici&oacute;n e ir guardando su avance.
+          </div>
+          <p style="clear: both;"></p>
+          <hr/>
+          <div class="col-sm-3 boton-index">
+            <p>
+              <a class="btn btn-success" role="button" href="/reportes/0"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> Acceder</a>
+            </p>
+          </div>
+          <div class="col-sm-5 info-index">
+            <h3>Reportes</h3>Esta secci&oacute;n le permite obtener los reportes para contabilidad una vez que haya cerrado la rendici&oacute;n.
+          </div>
+
+          <p style="clear: both;"></p>
+          <hr/>
+          <div class="col-md-8 alert alert-danger">
+            <p><h3>Atenci&oacute;n!</h3> Durante el siguiente per&iacute;odo se comenzar&aacute; la marcha blanca de esta herramienta. Por favor cualquier duda con respecto al funcionamiento contactar a Constanza Vial [cvial@protectora.cl]</p>
+	  </div>
+
+        </div>
+      {#% endblock %#}
+
+      {#% block menuright %#}
+        <!--div class="col-sm-2 sidenav">
+          <div class="well">
+            <p>ADS</p>
+          </div>
+          <div class="well">
+            <p>ADS</p>
+          </div>
+        </div-->
+      {#% endblock %#}
+
+    {% endif %}
+  {% else %}
+    <div class="col-sm-2"></div>
+    <div class="jumbotron col-sm-8" style="margin-top: 100px;">
+	<h2>Usuario no registrado!</h2>
+        <p style="text-align:center;">
+          Registrese haciendo click en el siguiente bot&oacute;n: <br/><br/><a href="{% url 'login' %}" class="btn-primary" type="button">Login</a>
+        </p>
+    </div>
+    <div class="col-sm-2"></div>
+  {% endif %}
+
+{% endblock %}

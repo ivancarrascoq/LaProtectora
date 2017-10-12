@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+
+        <div class="col-md-1 sidenav">
+	<!--
+          <p><span class="titulo-sidenav">Rendiciones Pendientes</span></p>
+          {% for i in context %}
+            <p>
+              <a class="rid" href="/rendicion/{{i.id}}">{{forloop.counter}}. {{i.subvencion.nombre|upper|slice:":3"}} {{i.mes_gasto|title|slice:":3"}}-{{i.fecha_subida|date:"Y"}} ({{i.id}})</a>
+
+          {% endfor %}
+          </p>
+          <p><span class="titulo-sidenav">Rendiciones Cerradas</span></p>
+          {% for i in r_close %}
+          <p>
+            <a class="rid" href="/reportes/{{i.id}}" style="color: #337ab7;text-decoration: none;">{{forloop.counter}}. <i class="fa fa-lock" aria-hidden="true"></i> {{i.subvencion.nombre|upper|slice:":3"}} {{i.mes_gasto|title|slice:":3"}}-{{i.fecha_subida|date:"Y"}} ({{i.id}}) </a>
+          </p>
+          {% endfor %}
+	-->
+        </div >
+
+        <div class="col-sm-11 text-left" id="detalle" style="padding-left: 80px;">
+          
+
+    <h1>Editar Perfil</h1>
+  	<hr>
+	<div class="row">
+      <div class="col-md-9 personal-info">
+        <h3>Informaci&oacute;n Personal</h3>
+        
+        <form class="form-horizontal" role="form" action="{% url 'save_perfil' %}" method="post">
+	  {% csrf_token %}
+          <div class="form-group">
+            <label class="col-lg-3 control-label">Nombre:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" value="{{user.first_name}}" name="first_name">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">Apellido:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" value="{{user.last_name}}" name="last_name">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">Email:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" value="{{user.username}}" name="username" readonly>
+            </div>
+          </div>
+          <div class="form-group">
+	    <label class="col-md-3 control-label">
+	    </label>
+	    <div class="col-md-8">
+	      <a href="#" id="cambiar-pass1" onclick="showhidepass()">cambiar/mantener contrase&ntilde;a</a>
+              <!--a href="#" id="cambiar-pass1">mantener contrase&ntilde;a</a-->
+	    </div>
+	  </div>
+	<div id="cambiar-pass2" style="display:none;">
+          <div class="form-group">
+            <label class="col-md-3 control-label">Password:</label>
+            <div class="col-md-8">
+              <input class="form" id="password" type="password" name="password">
+	      <button type="button" id="eye">
+		<img src="https://cdn0.iconfinder.com/data/icons/feather/96/eye-16.png" alt="eye" />
+	      </button>
+            </div>
+          </div>
+          <!--div class="form-group">
+            <label class="col-md-3 control-label">Confirm password:</label>
+            <div class="col-md-8">
+              <input class="form-control" id="password_check" type="password" name="password_check">
+            </div>
+          </div-->
+	</div>
+          <div class="form-group">
+            <label class="col-md-3 control-label"></label>
+            <div class="col-md-8">
+              <input type="submit" class="btn btn-primary" value="Guardar Cambios">
+            </div>
+          </div>
+        </form>
+      </div>
+  </div>
+
+{% if user.is_superuser %}
+  <div class="row">
+    <div class="col-md-9 personal-info">
+    <h2>Editar Usuarios</h2>
+
+	<table class="table table-hover">
+	    <thead>
+	        <tr>
+		    <th>#</th>
+	            <th>Email</th>
+	            <th>Contrase&ntilde;a</th>
+	            <th>Administrador</th>
+	            <th>Activo</th>
+		    <th>Op</th>
+	        </tr>
+	    </thead>
+	    <tbody>
+	      {% for i in users %}
+	        <form class="form-horizontal" role="form" action="{% url 'change_perfil' i.id %}" method="post">
+		  {% csrf_token %}
+	          <tr>
+		    <td>{{forloop.counter}}</td>
+	            <td>{{i.username}}</td>
+	            <td><input type="text" name="password" placeholder="no se modificar&aacute;" /></td>
+	            <td><input type="checkbox" name="superuser" {%if i.is_superuser%}checked{%endif%}/></td>
+	            <td><input type="checkbox" name="active" {%if i.is_active%}checked{%endif%}/></td>
+		    <td><input type="submit" class="btn btn-primary" value="Cambiar"></td>
+	          </tr>
+	        </form>
+	      {% endfor %}
+	    </tbody>
+	</table>
+
+    </div>
+  </div>
+{% endif %}
+
+        <script>
+	function showhidepass() {
+	    var x = document.getElementById('cambiar-pass2');
+	    if (x.style.display === 'none') {
+	        x.style.display = 'block';
+                $('#password').val('');
+	    } else {
+	        x.style.display = 'none';
+		$('#password').val('');
+	    }
+	}
+	function show() {
+	    var p = document.getElementById('password');
+	    p.setAttribute('type', 'text');
+	}
+	function hide() {
+	    var p = document.getElementById('password');
+	    p.setAttribute('type', 'password');
+	}
+	var pwShown = 0;
+	document.getElementById("eye").addEventListener("click", function () {
+	    if (pwShown == 0) {
+	        pwShown = 1;
+	        show();
+	    } else {
+	        pwShown = 0;
+	        hide();
+	    }
+	}, false);
+
+        </script>
+	<!--script>
+	var password = document.getElementById("password")
+	  , confirm_password = document.getElementById("password_check");
+
+	function validatePassword(){
+	  if(password.value != confirm_password.value) {
+	    confirm_password.setCustomValidity("passwords no coinciden");
+	  } else {
+	    confirm_password.setCustomValidity('');
+	  }
+	}
+
+	password.onchange = validatePassword;
+	confirm_password.onkeyup = validatePassword;
+	</script-->
+
+        </div>
+
+{% endblock %}

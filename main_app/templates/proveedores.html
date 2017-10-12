@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+<style>
+	.pagination li {
+  display:inline-block;
+  padding:5px;
+}
+</style>
+
+        <div class="col-md-1 sidenav">
+        </div >
+
+        <div class="col-sm-11 text-left" id="detalle" style="padding-left: 80px;">
+          
+
+    <h1>Proveedores</h1>
+  	<hr>
+	<div class="row">
+      <div class="col-md-9 personal-info">
+        <h3>Agregar nuevo proveedor</h3>
+        
+        <form class="form-horizontal" role="form" action="{% url 'save_proveedor' %}" method="post">
+	  {% csrf_token %}
+          <div class="form-group">
+            <label class="col-lg-3 control-label">RUT:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" value="" name="rut">
+            </div>
+					</div>
+					<div class="form-group">
+            <label class="col-lg-3 control-label">Nombre:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" value="" name="nombre">
+            </div>
+          </div>
+          
+
+          <div class="form-group">
+	    <label class="col-md-3 control-label">
+	    </label>
+	  </div>
+          <div class="form-group">
+            <label class="col-md-3 control-label"></label>
+            <div class="col-md-8">
+              <input type="submit" class="btn btn-primary" value="Agregar">
+            </div>
+          </div>
+        </form>
+      </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-9 personal-info">
+    <h2>Proveedores</h2>
+
+	<!--table class="table table-hover">
+	    <thead>
+	        <tr>
+		          <th>#</th>
+	            <th>Nombre</th>
+	            <th>RUT</th>
+		          <th><span class="glyphicon glyphicon-cog"></span></th>
+	        </tr>
+	    </thead>
+	    <tbody-->
+				<div id="prov-list">
+					<input type="text" class="search" />
+					<ul class="list">
+  	        {% for i in proveedores %}
+						<li class="name">
+						<tr>
+  		        <td>{{forloop.counter}}</td>
+	            <td>{{i.nombre}}</td>
+	            <td>{{i.rut}}</i></td>
+							<td><a href="{% url 'del_proveedor' i.id %}" style="color:red;" >Borrar</a></td>
+						</tr>
+					  </li>
+						{% endfor %}
+				  </ul>
+					<ul class="pagination"></ul>
+				</div>
+				<script>var monkeyList = new List('prov-list', {
+						valueNames: ['name'],
+						page: 20,
+						pagination: true
+					});
+				</script>
+
+			<!--/tbody>
+	</table-->
+
+    </div>
+  </div>
+
+
+        <script>
+	function showhidepass() {
+	    var x = document.getElementById('cambiar-pass2');
+	    if (x.style.display === 'none') {
+	        x.style.display = 'block';
+                $('#password').val('');
+	    } else {
+	        x.style.display = 'none';
+		$('#password').val('');
+	    }
+	}
+	function show() {
+	    var p = document.getElementById('password');
+	    p.setAttribute('type', 'text');
+	}
+	function hide() {
+	    var p = document.getElementById('password');
+	    p.setAttribute('type', 'password');
+	}
+	var pwShown = 0;
+	document.getElementById("eye").addEventListener("click", function () {
+	    if (pwShown == 0) {
+	        pwShown = 1;
+	        show();
+	    } else {
+	        pwShown = 0;
+	        hide();
+	    }
+	}, false);
+
+        </script>
+        </div>
+
+{% endblock %}
+
