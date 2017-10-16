@@ -9,14 +9,19 @@
 }
 </style>
 
-        <div class="col-md-1 sidenav">
-        </div >
+<script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
 
-        <div class="col-sm-11 text-left" id="detalle" style="padding-left: 80px;">
+<div class="col-md-1 sidenav">
+</div >
+<div class="col-sm-11 text-left" id="detalle" style="padding-left: 80px;">
           
 
     <h1>Proveedores</h1>
-  	<hr>
+		<hr>
+		
+
+		<div id="contacts">
+
 	<div class="row">
       <div class="col-md-9 personal-info">
         <h3>Agregar nuevo proveedor</h3>
@@ -54,48 +59,47 @@
   <div class="row">
     <div class="col-md-9 personal-info">
     <h2>Proveedores</h2>
-
-	<!--table class="table table-hover">
-	    <thead>
-	        <tr>
-		          <th>#</th>
-	            <th>Nombre</th>
-	            <th>RUT</th>
-		          <th><span class="glyphicon glyphicon-cog"></span></th>
-	        </tr>
-	    </thead>
-	    <tbody-->
 				<div id="prov-list">
-					<input type="text" class="search" />
-					<ul class="list">
-  	        {% for i in proveedores %}
-						<li class="name">
-						<tr>
-  		        <td>{{forloop.counter}}</td>
-	            <td>{{i.nombre}}</td>
-	            <td>{{i.rut}}</i></td>
-							<td><a href="{% url 'del_proveedor' i.id %}" style="color:red;" >Borrar</a></td>
+					<input type="text" class="search" /><!--ul class="list"-->
+					<table>
+						<thead><tr><th>#</th><th style="padding: 0 5px;">Nombre</th><th>Rut</th><th></th></tr></thead>
+						<tbody class="list">
+						{% for i in proveedores %}
+						<!--li><p class="name">{{i.rut}}</p></li-->
+						<!--li class="name">{{i.rut}}-->
+						
+							<tr>
+  		        <td >{{forloop.counter}}</td>
+	            <td class="name">{{i.nombre}}</td>
+	            <td class="rut">{{i.rut}}</td>
+							<td>
+								<a href="{% url 'del_proveedor' i.id %}" onclick="return confirm('seguro que desea borrar el registro?')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
 						</tr>
-					  </li>
-						{% endfor %}
-				  </ul>
+					  <!--/li-->
+						{% endfor %}</tbody></table>
+				  <!--/ul-->
 					<ul class="pagination"></ul>
 				</div>
 				<script>var monkeyList = new List('prov-list', {
-						valueNames: ['name'],
+						valueNames: ['name','rut'],
 						page: 20,
 						pagination: true
 					});
 				</script>
 
-			<!--/tbody>
-	</table-->
-
     </div>
   </div>
 
 
-        <script>
+<script>
+	var elems = document.getElementsByClassName('confirmation');
+  var confirmIt = function (e) {
+      if (!confirm('Are you sure?')) e.preventDefault();
+  };
+  for (var i = 0, l = elems.length; i < l; i++) {
+      elems[i].addEventListener('click', confirmIt, false);
+  }
+
 	function showhidepass() {
 	    var x = document.getElementById('cambiar-pass2');
 	    if (x.style.display === 'none') {
@@ -125,7 +129,7 @@
 	    }
 	}, false);
 
-        </script>
+</script>
         </div>
 
 {% endblock %}
