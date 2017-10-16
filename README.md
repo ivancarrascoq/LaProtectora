@@ -2,7 +2,7 @@
 F200
 
 check django version:
-´´´bach
+´´´bash
 python -m django --version
 ´´´
 if not installed:
