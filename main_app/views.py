@@ -904,11 +904,19 @@ def save_proveedor(request):
       #print 'auth y username'
       #proveedores = Proveedor.objects.get(id = user.id)
       if form['rut'] and form['nombre']:
-        pc = Proveedor.objects.create(nombre = form['nombre'], rut = form['rut'])
-        #perfil.save()
-        print 'se ha creado un nuevo proveedor el perfil del user id: ',pc.id
+        if form['id']:
+          pc = Proveedor.objects.filter(id = form['id']).update(
+          nombre = form['nombre'],
+          rut = form['rut']
+          )
+          print 'se ha editado el proveedor con id: ',form['id']
+        else:
+          pc = Proveedor.objects.create(nombre = form['nombre'], rut = form['rut'])
+          #perfil.save()
+          print 'se ha creado un nuevo proveedor el perfil del user id: ',pc.id
         return HttpResponseRedirect('/proveedores')
       else:
+        print 'no ha escrito datos para ser registrados'
         return HttpResponseRedirect('/proveedores')
     else:
       print 'operacion bloqueada'

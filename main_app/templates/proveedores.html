@@ -7,11 +7,14 @@
   display:inline-block;
   padding:5px;
 }
+  input{
+  text-transform: none !important;
+}
 </style>
 
 <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
 
-<div class="col-md-1 sidenav">
+<div class="col-sm-1 sidenav">
 </div >
 <div class="col-sm-11 text-left" id="detalle" style="padding-left: 80px;">
           
@@ -24,20 +27,21 @@
 
 	<div class="row">
       <div class="col-md-9 personal-info">
-        <h3>Agregar nuevo proveedor</h3>
+        <h3 id="titulo">Agregar nuevo proveedor</h3>
         
         <form class="form-horizontal" role="form" action="{% url 'save_proveedor' %}" method="post">
 	  {% csrf_token %}
           <div class="form-group">
+							<input class="form-control add_id" type="text" value="" name="id" id="id" style="display:none;">
             <label class="col-lg-3 control-label">RUT:</label>
             <div class="col-lg-8">
-              <input class="form-control" type="text" value="" name="rut">
+              <input class="form-control add_rut" type="text" value="" name="rut" id="input_rut">
             </div>
 					</div>
 					<div class="form-group">
             <label class="col-lg-3 control-label">Nombre:</label>
             <div class="col-lg-8">
-              <input class="form-control" type="text" value="" name="nombre">
+              <input class="form-control add_name" type="text" value="" name="nombre" id="input_nombre">
             </div>
           </div>
           
@@ -49,7 +53,8 @@
           <div class="form-group">
             <label class="col-md-3 control-label"></label>
             <div class="col-md-8">
-              <input type="submit" class="btn btn-primary" value="Agregar">
+							<input id="primary" type="submit" class="btn btn-primary" value="Agregar">
+							<button id="cancel_edit" type="button" class="btn btn-secondary" style="display: none;"><a href="#" onclick="cancel_edit()" style="text-decoration:none;">Cancelar</a></button>
             </div>
           </div>
         </form>
@@ -60,7 +65,7 @@
     <div class="col-md-9 personal-info">
     <h2>Proveedores</h2>
 				<div id="prov-list">
-					<input type="text" class="search" /><!--ul class="list"-->
+					Buscar: <input type="text" class="search" /><!--ul class="list"-->
 					<table>
 						<thead><tr><th>#</th><th style="padding: 0 5px;">Nombre</th><th>Rut</th><th></th></tr></thead>
 						<tbody class="list">
@@ -68,13 +73,14 @@
 						<!--li><p class="name">{{i.rut}}</p></li-->
 						<!--li class="name">{{i.rut}}-->
 						
-							<tr>
+							<tr id="{{i.id}}">
   		        <td >{{forloop.counter}}</td>
 	            <td class="name">{{i.nombre}}</td>
 	            <td class="rut">{{i.rut}}</td>
 							<td>
 								<a href="{% url 'del_proveedor' i.id %}" onclick="return confirm('seguro que desea borrar el registro?')" style="color:red;"><span class="glyphicon glyphicon-remove"></span></a>
-						</tr>
+								<a class="" href="#" onclick="edit_rut({{i.id}}); return false;" style="color:blue;"><span class="glyphicon glyphicon-pencil"></span></a>
+							</tr>
 					  <!--/li-->
 						{% endfor %}</tbody></table>
 				  <!--/ul-->
@@ -100,7 +106,37 @@
       elems[i].addEventListener('click', confirmIt, false);
   }
 
-	function showhidepass() {
+	function edit_rut(a){
+		//preventDefault();
+		console.log(a);
+		//$('.add_rut').val();
+		//$('.add_name').val();
+		//var b = '.'+a+'.name';
+		var b = $('#'+a+' .name').html();
+		var c = $('#'+a+' .rut').html();
+		$('input#input_rut').val(c);
+		$('input#input_nombre').val(b);
+		$('input#id').val(a);
+		$('#cancel_edit').css('display','inline');
+		$('h3#titulo').html("Editar proveedor (#id: "+a+")");
+		$('tr').css('background','white');
+		$('tr#'+a).css('background','#ffff72');
+		$('input#primary').val('Editar');
+		//console.log(b);
+		//console.log(c);
+		//return false;
+	}
+
+	function cancel_edit(){
+		$('#cancel_edit').css('display','none');
+		$('input#id').val("");
+		$('input#input_rut').val("");
+		$('input#input_nombre').val("");	
+		$('h3#titulo').html("Agregar nuevo proveedor");	
+		$('tr').css('background','white');
+		$('input#primary').val('Agregar');
+	}
+	/*function showhidepass() {
 	    var x = document.getElementById('cambiar-pass2');
 	    if (x.style.display === 'none') {
 	        x.style.display = 'block';
@@ -127,7 +163,7 @@
 	        pwShown = 0;
 	        hide();
 	    }
-	}, false);
+	}, false);*/
 
 </script>
         </div>
