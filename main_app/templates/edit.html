@@ -4,6 +4,10 @@
 
 {% block content%}
   {% if user.is_authenticated %}
+  <link href="{% static 'chosen/docsupport/style.css' %}" rel="stylesheet">
+  <link href="{% static 'chosen/docsupport/prism.css' %}" rel="stylesheet">
+  <link href="{% static 'chosen/chosen.css' %}" rel="stylesheet">
+
     {% if user.is_superuser %}<!--admin-->
 
       {#% block menuleft %#}
@@ -14,9 +18,8 @@
           {#% endfor %#}
         </div >
       {#% endblock %#}
-
+ 
       {#% block content %#} 
-
 
 
 
@@ -270,7 +273,7 @@
                                                 select = $('#subcategoria_id.subcategoria-{{a.first.id}}');
                                                 $('#subcategoria_id.subcategoria-{{a.first.id}}').empty();
                                                 for (var i in data){
-                                                    console.log(data[i].id + " - " + data[i].nombre);
+                                                    //console.log(data[i].id + " - " + data[i].nombre);
                                                     var option = document.createElement('option');
                                                     option.innerHTML = data[i].nombre.toLowerCase();
                                                     option.value = data[i].id;
@@ -379,7 +382,7 @@
                  >
                </td>
                <td><!--rut proveedor-->
-                 <input id="proveedor_rut" name="{{a.first.id}}" type="text" class="form-control" 
+                 <input readonly id="proveedor_rut-{{a.first.id}}" name="{{a.first.id}}" type="text" class="form-control" 
                   pattern="^\d{7,8}-[0-9-,k]{1}$" value=
                    {% if a.first.proveedor_rut == None %}
                      ""
@@ -388,13 +391,78 @@
                    {% endif %}
                </td>
                <td><!--nombre proveedor-->
-                 <input id="proveedor_nombre" name="{{a.first.id}}" type="text" class="form-control" value=
+                 <!--input id="proveedor_nombre" name="{{a.first.id}}" type="text" class="form-control" value=
                    {% if a.first.proveedor_nombre == None %}
                      ""
                    {% else %}   
-                     "{{a.first.proveedor_nombre|title}}">
+                     "{{a.first.proveedor_nombre|title}}"
                    {% endif %}
-               </td>
+               >-->
+               <div class="controls">
+                  <select id="proveedor_nombre-{{a.first.id}}" name="{{a.first.id}}" class="form-control" onchange="proveedor_fill({{a.first.id}})">
+                    {% for i in proveedores %} 
+                       <option class="{{forloop.counter}}" value="{{i.id}}|{{i.rut}}"
+                       {% if a.first.proveedor_id == i.id %}selected{% endif %}
+                       >{{i.nombre}}</option>
+                    {% endfor %}
+
+                    
+                  </select>          
+                </div>
+                
+ <!--modal -->
+ <style>
+  /* The Modal (background) */
+  .modal {display: none; /* Hidden by default */position: fixed; /* Stay in place */z-index: 1; /* Sit on top */padding-top: 100px; /* Location of the box */  left: 0;top: 0;width: 100%; /* Full width */height: 100%; /* Full height */overflow: auto; /* Enable scroll if needed */  background-color: rgb(0,0,0); /* Fallback color */background-color: rgba(0,0,0,0.4); /* Black w/ opacity */  }   /* Modal Content */  
+  .modal-content {background-color: #fefefe;margin: auto;padding: 20px;border: 1px solid #888;width: 80%;}    /* The Close Button */  
+  .close-{{a.first.id}} {color: #aaaaaa;float: right;font-size: 28px;font-weight: bold;}  
+  .close-{{a.first.id}}:hover,  .close-{{a.first.id}}:focus {color: #000;text-decoration: none;cursor: pointer;}  
+  </style>
+<!-- Trigger/Open The Modal -->
+<!--button id="myBtn-{{a.first.id}}">Open Modal</button-->
+<button onclick="proveedormodal({{a.first.id}})" id="myBtn-{{a.first.id}}" style="display:none;">Open Modal</button>
+
+
+<!-- The Modal -->
+<div id="myModal-{{a.first.id}}" class="modal"><!-- Modal content -->
+  <div class="modal-content"><span class="close-{{a.first.id}}">&times;</span>
+    <p>id registro: {{a.first.id}}
+               <!--div class="controls"-->
+                  <select data-placeholder="Seleccione proveedor..." class="chosen-select" tabindex="2"  >
+                    {% for i in proveedores %} 
+                       <option class="{{forloop.counter}}" value="{{i.id}}" >{{i.nombre}}</option>
+                    {% endfor %}
+                  </select>          
+                <!--/div-->
+    </p>
+  </div>
+</div>
+
+
+
+<script>
+  function proveedormodal(a){
+    event.preventDefault();
+  // Get the modal
+  //console.log(a);
+  var modal = document.getElementById('myModal-'+a);
+  modal.style.display = "block";
+  // Get the button that opens the modal
+  var btn = document.getElementById("myBtn-"+a);
+  // Get the <span> element that closes the modal
+  var span = document.getElementsByClassName("close-"+a)[0];
+  // When the user clicks the button, open the modal 
+  // When the user clicks on <span> (x), close the modal
+  span.onclick = function() {modal.style.display = "none";}
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function(event) { if (event.target == modal) {modal.style.display = "none";}}
+  }
+
+  </script>
+
+ <!--end modal -->
+                  
+              </td>
                <!--monto gasto-->
                 <script>
                     $(document).ready(function(e)
@@ -1084,23 +1152,38 @@
                    {% endif %}
                  >
                </td>
+
                <td><!--rut proveedor-->
-                 <input id="proveedor_rut" name="{{a.first.id}}" type="text" class="form-control" 
-                  pattern="^\d{7,8}-[0-9-,k]{1}$" value=
-                   {% if a.first.proveedor_rut == None %}
-                     ""
-                   {% else %}   
-                     "{{a.first.proveedor_rut}}">
-                   {% endif %}
-               </td>
-               <td><!--nombre proveedor-->
-                 <input id="proveedor_nombre" name="{{a.first.id}}" type="text" class="form-control" value=
-                   {% if a.first.proveedor_nombre == None %}
-                     ""
-                   {% else %}   
-                     "{{a.first.proveedor_nombre|title}}">
-                   {% endif %}
-               </td>
+                <input readonly id="proveedor_rut-{{a.first.id}}" name="{{a.first.id}}" type="text" class="form-control" 
+                 pattern="^\d{7,8}-[0-9-,k]{1}$" value=
+                  {% if a.first.proveedor_rut == None %}
+                    ""
+                  {% else %}   
+                    "{{a.first.proveedor_rut}}">
+                  {% endif %}
+              </td>
+              <td><!--nombre proveedor-->
+                <!--input id="proveedor_nombre" name="{{a.first.id}}" type="text" class="form-control" value=
+                  {% if a.first.proveedor_nombre == None %}
+                    ""
+                  {% else %}   
+                    "{{a.first.proveedor_nombre|title}}"
+                  {% endif %}
+              >-->
+              <div class="controls">
+                 <select id="proveedor_nombre-{{a.first.id}}" name="{{a.first.id}}" class="form-control" onchange="proveedor_fill({{a.first.id}})">
+                   {% for i in proveedores %} 
+                      <option class="{{forloop.counter}}" value="{{i.id}}|{{i.rut}}"
+                      {% if a.first.proveedor_id == i.id %}selected{% endif %}
+                      >{{i.nombre}}</option>
+                   {% endfor %}
+
+                   
+                 </select>          
+               </div>
+               
+               
+               
                <!--td><!-monto gasto->
                  <input id="gasto" name="{{a.first.id}}" type="number" class="form-control {{a.first.id}} gasto-seccion2" value="{{a.first.gasto}}" min="0">
 <!- onKeyUp="checkvalmonto{{a.first.id}}()"->
@@ -1461,5 +1544,15 @@ $(document).ready(function(e)
   {% else %}
     Usuario no registrado! 
   {% endif %}
-
+  <script src="{% static 'chosen/chosen.jquery.js' %}" type="text/javascript"></script>
+  <script src="{% static 'chosen/docsupport/prism.js' %}" type="text/javascript" charset="utf-8"></script>
+  <script src="{% static 'chosen/docsupport/init.js' %}" type="text/javascript" charset="utf-8"></script>
+  <script>
+    function proveedor_fill(id){
+      var a = $("#proveedor_nombre-"+id).val();
+      var rut = a.split("|")[1];
+      console.log(id+","+rut);
+      $("#proveedor_rut-"+id).val(rut);
+    };
+  </script>
 {% endblock %}

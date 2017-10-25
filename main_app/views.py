@@ -109,12 +109,11 @@ def edit(request, rid):
     rfd = RendicionesFondosDetalles.objects.filter(rendicion_id = rid)
     rfd_count = rfd.count()
     rfd_array = list()#range(rfd_count))
-    for j in rfd:
-##        print 'RFD '+str(j.id)+' fondo_id: '+str(j.fondos_detalles_id)+', rendicion id: '+str(j.rendicion_id)
-	rfd_array.append(FondoDetalle.objects.select_related('doc_tipo','proveedor','contabilidad',
-        'contabilidad_hijo','categoria','subcategoria').filter(id = int(j.fondos_detalles_id)))
+    for j in rfd:##        print 'RFD '+str(j.id)+' fondo_id: '+str(j.fondos_detalles_id)+', rendicion id: '+str(j.rendicion_id)
+      rfd_array.append(FondoDetalle.objects.select_related('doc_tipo','proveedor','contabilidad', 'contabilidad_hijo','categoria','subcategoria').filter(id = int(j.fondos_detalles_id)))
+ #     print 'test',FondoDetalle.objects.select_related('doc_tipo','proveedor','contabilidad', 'contabilidad_hijo','categoria','subcategoria').filter(j.fondos_detalles_id)
 #        rfd_array.append(FondoDetalle.objects.select_related('doc_tipo').select_related('proveedor').#        select_related('contabilidad').select_related('contabilidad_hijo').#        select_related('categoria').select_related('subcategoria').#        filter(id = int(j.fondos_detalles_id)))##    print rfd_array##    print "for in array"#    for a in rfd_array:#        print a[0]    #gasto: devolucion
-
+    print rfd_array
 #restricciones para cerrar rendicion
     close_rid = 0
     close_rid_f = 0
@@ -192,14 +191,14 @@ def edit(request, rid):
     rgd_count = rgd.count()
     rgd_array = list()
     for j in rgd:
-##        print 'RGD '+str(j.id)+' gasto_id: '+str(j.gastos_detalles_id)+', rendicion id: '+str(j.rendicion_id)
-        rgd_array.append(GastoDetalle.objects.filter(id = int(j.gastos_detalles_id)))
-##    print rgd_array##    print "for in array"
-#    for a in rgd_array:
-#        print a[0]
+    ##        print 'RGD '+str(j.id)+' gasto_id: '+str(j.gastos_detalles_id)+', rendicion id: '+str(j.rendicion_id)
+      rgd_array.append(GastoDetalle.objects.filter(id = int(j.gastos_detalles_id)))
+    ##    print rgd_array##    print "for in array"
+    #    for a in rgd_array:
+    #        print a[0]
 
     xrendir = 0
-##    xrendir = rid.monto
+    ##    xrendir = rid.monto
     sum_gasto = 0
     sum_dev = 0
     for x in rfd.select_related('fondos_detalles'):
@@ -207,20 +206,20 @@ def edit(request, rid):
             sum_gasto += x.fondos_detalles.gasto
         except:
             sum_gasto = 0
-##    print "sum gasto " + str(sum_gasto)
+    ##    print "sum gasto " + str(sum_gasto)
     for x in rgd.select_related('gastos_detalles'):
         try:
             sum_dev += x.gastos_detalles.monto
         except:
             sum_dev = 0
-##    print "sum dev " + str(sum_dev)
+    ##    print "sum dev " + str(sum_dev)
     xrendir = rid.monto - sum_gasto - sum_dev
-
-
+    proveedores = Proveedor.objects.all().order_by('nombre')
+    #print 'proveedores',proveedores
     return render(request, 'edit.html', {'centrocosto': centrocosto, 'mes': mes, 'tipofondo': tipofondo, 
     'subvencion': subvencion, 'rid': rid, 'rall':rall, 'rfd_array': rfd_array, 'rgd_array': rgd_array,
     'cheque': cheque, 'doctipo': doctipo, 'contabilidad': contabilidad, 'categoria': categoria,
-    'xrendir': xrendir, 'close_rid': close_rid })
+    'xrendir': xrendir, 'close_rid': close_rid, 'proveedores': proveedores })
 
 def addfd(request):
     print 'Add FD:'
@@ -243,7 +242,7 @@ def addfdjs(request):
     new_date = Rendicion.objects.get(id = rid).fecha_subida.replace(day=1)
     print new_date
     fd = FondoDetalle.objects.create(cheque = 2, categoria_id = 55, contabilidad_id = 24, contabilidad_hijo_id = 57,
-         doc_tipo_id = '19', proveedor_id = '3', subcategoria_id = 234, doc_fecha = new_date,
+         doc_tipo_id = '19', proveedor_id = '1000', subcategoria_id = 234, doc_fecha = new_date,
          doc_fecha_pago = new_date, doc_monto = 0, gasto = 0)
     fd_id = str(fd.id)
     print 'FondoDetalle.id: ' + str(fd_id)
@@ -373,7 +372,7 @@ def save_rendicion(request):
 #seccion II
             if type(i) == int and i > 0:
 #                print 'ID fondos - seccion II: ' + str(i)
-#                print form[str(i)]
+                print form[str(i)]
 #                print '########cheque###########' + form[str(i)][0]
                 FondoDetalle.objects.filter(id = i).update(
                  categoria_id = form[str(i)][0],
@@ -386,7 +385,10 @@ def save_rendicion(request):
                  doc_fecha_pago = form[str(i)][7],
                  doc_detalle = form[str(i)][8],
                  proveedor_rut = form[str(i)][9],
-                 proveedor_nombre = form[str(i)][10],
+                 #proveedor_nombre = form[str(i)][10],
+                 proveedor_nombre = Proveedor.objects.get(id=(form[str(i)][10].split("|")[0])).nombre,
+                 proveedor_id = form[str(i)][10].split("|")[0],
+                 #
                  gasto = form[str(i)][12],
                  doc_monto = form[str(i)][11],
                  contabilidad_id = form[str(i)][13],
@@ -889,7 +891,7 @@ def proveedores(request):
     if auth == False or user.is_superuser == False:
         return HttpResponseRedirect('/')
     else:
-        proveedores = Proveedor.objects.all().order_by('nombre')
+        proveedores = Proveedor.objects.all().order_by('nombre').exclude(id = 1000)
 #    if user.is_superuser:
     return render(request, 'proveedores.html', {'proveedores':proveedores})
 
