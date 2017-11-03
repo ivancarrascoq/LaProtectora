@@ -12,9 +12,6 @@
 
       {#% block menuleft %#}
         <div class="col-sm-1 sidenav">
-          <!--p><h4>&Uacute;ltimas rendiciones</h4></p>
-          {#% for i in rall %#}
-            <p><a class="rid" href="rendicion/{{i.id}}">[{{i.id}}:{{i.user_id}}]</a></p-->
           {#% endfor %#}
         </div >
       {#% endblock %#}
@@ -232,7 +229,7 @@
               <th>Fecha documento</th>    
               <th>Fecha de pago</th>    
               <th>Descripci&oacute;n del gasto</th> 
-              <th>Editar Proveedor</th>   
+              <th>Buscar Proveedor</th>   
               <th>Rut Proveedor</th>    
               <th>Nombre Proveedor</th>    
               <th>Monto Documento</th>    
@@ -403,15 +400,6 @@
                      "{{a.first.proveedor_nombre}}"
                    {% endif %}
                 >
-               <!--div class="controls">
-                  <select id="proveedor_nombre-{{a.first.id}}" name="{{a.first.id}}" class="form-control" onchange="proveedor_fill({{a.first.id}},value)">
-                    {#% for i in proveedores %#} 
-                       <option class="{{forloop.counter}}" value="{{i.id}}|{{i.rut}}"
-                       {#% if a.first.proveedor_id == i.id %#}selected{#% endif %#}
-                       >{{i.nombre}}</option>
-                    {#% endfor %#}
-                  </select>
-                </div-->
                 
  <!--modal -->
 
@@ -1006,7 +994,8 @@
 	      <th>Fecha documento</th>    
 	      <th>Fecha de pago</th>    
               <th>Descripci&oacute;n del gasto</th>    
-              <th>Rut Proveedor <i>(xxxxxxxx-x)</i></th>    
+              <th>Buscar Proveedor</th>   
+              <th>Rut Proveedor</th>    
               <th>Nombre Proveedor</th>    
               <th>Monto Documento</th>    
               <th>Monto Gasto</th>    
@@ -1163,37 +1152,87 @@
                    {% endif %}
                  >
                </td>
-
+           <!--modal-->
+               <td style="text-align: center;"><a onclick="proveedormodal({{a.first.id}})" id="myBtn-{{a.first.id}}" ><span class="glyphicon glyphicon-edit"></span></a></td>
+           <!--endmodal-->
                <td><!--rut proveedor-->
-                <input readonly id="proveedor_rut-{{a.first.id}}" name="{{a.first.id}}" type="text" class="form-control" 
-                 pattern="^\d{7,8}-[0-9-,k]{1}$" value=
-                  {% if a.first.proveedor_rut == None %}
-                    ""
-                  {% else %}   
-                    "{{a.first.proveedor_rut}}">
-                  {% endif %}
-              </td>
-              <td><!--nombre proveedor-->
-                <!--input id="proveedor_nombre" name="{{a.first.id}}" type="text" class="form-control" value=
-                  {% if a.first.proveedor_nombre == None %}
-                    ""
-                  {% else %}   
-                    "{{a.first.proveedor_nombre|title}}"
-                  {% endif %}
-              >-->
-              <div class="controls">
-                 <select id="proveedor_nombre-{{a.first.id}}" name="{{a.first.id}}" class="form-control" onchange="proveedor_fill({{a.first.id}})">
-                   {% for i in proveedores %} 
-                      <option class="{{forloop.counter}}" value="{{i.id}}|{{i.rut}}"
-                      {% if a.first.proveedor_id == i.id %}selected{% endif %}
-                      >{{i.nombre}}</option>
-                   {% endfor %}
+                 <input readonly id="proveedor_rut-{{a.first.id}}" name="{{a.first.id}}" type="text" class="form-control" style="width: 110px;"
+                  pattern="^\d{7,8}-[0-9-,k]{1}$" value=
+                   {% if a.first.proveedor_rut == None %}
+                     ""
+                   {% else %}   
+                     "{{a.first.proveedor_rut}}">
+                   {% endif %}
+               </td>
+               <td><!--nombre proveedor-->
+                 <input readonly id="proveedor_nombre-{{a.first.id}}" name="{{a.first.id}}" type="text" class="form-control" style="width: 300px;"
+                 value=
+                   {% if a.first.proveedor_nombre == None %}
+                     ""
+                   {% else %}   
+                     "{{a.first.proveedor_nombre}}"
+                   {% endif %}
+                >
 
-                   
-                 </select>          
-               </div>
-               
-               
+ <!--modal -->
+
+ <style>
+  /* The Modal (background) */
+  .modalp {display: none; /* Hidden by default */position: fixed; /* Stay in place */z-index: 1; /* Sit on top */padding-top: 100px; /* Location of the box */  left: 0;top: 0;width: 100%; /* Full width */height: 100%; /* Full height */overflow: auto; /* Enable scroll if needed */  background-color: rgb(0,0,0); /* Fallback color */background-color: rgba(0,0,0,0.4); /* Black w/ opacity */  }   /* Modal Content */  
+  .modalp-content {background-color: #fefefe;margin: auto;padding: 20px;border: 1px solid #888;width: 80%;}    /* The Close Button */  
+  .close-{{a.first.id}} {color: #aaaaaa;float: right;font-size: 28px;font-weight: bold;}  .close-{{a.first.id}}:hover,  .close-{{a.first.id}}:focus {color: #000;text-decoration: none;cursor: pointer;}  
+  </style>
+<!-- Trigger/Open The Modal -->
+<!--button id="myBtn-{{a.first.id}}">Open Modal</button-->
+
+
+<!-- The Modal -->
+<div id="myModal-{{a.first.id}}" class="modalp"><!-- Modal content -->
+  <div class="modalp-content">
+    <span class="close-{{a.first.id}}">&times;</span>
+
+    <p><!--id registro: {{a.first.id}}--><h3>Seleccione un proveedor:</h3>
+               <!--div class="controls"-->
+                  <select data-placeholder="Seleccione proveedor..." class="chosen-select" tabindex="2" onchange="chosen_fill_p({{a.first.id}},value)" >
+                    {% for i in proveedores %} 
+                       <option class="{{forloop.counter}}" value="{{i.id}}|{{i.rut}}|{{i.nombre}}"
+                       {% if a.first.proveedor_id == i.id %}selected{% endif %}
+                       >{{i.nombre}} - {{i.rut}}</option>
+                    {% endfor %}
+                  </select>          
+                <!--/div-->
+    </p>
+    <!--button type="submit" class="btn btn-primary" id="actualizar">Grabar</button-->
+  </div>
+</div>    
+
+<script>
+  function chosen_fill_p(reg_id,proveedor_id){
+    console.log(reg_id + ' - ' + proveedor_id);
+    $("#proveedor_nombre-"+reg_id).val(proveedor_id.split("|")[2]);
+    $("#proveedor_rut-"+reg_id).val(proveedor_id.split("|")[1]);
+
+  }
+  function proveedormodal(a){
+    event.preventDefault();
+  // Get the modal
+  //console.log("registro: "+a);
+  var modal = document.getElementById('myModal-'+a);
+  modal.style.display = "block";
+  // Get the button that opens the modal
+  var btn = document.getElementById("myBtn-"+a);
+  // Get the <span> element that closes the modal
+  var span = document.getElementsByClassName("close-"+a)[0];
+  // When the user clicks the button, open the modal 
+  // When the user clicks on <span> (x), close the modal
+  span.onclick = function() {modal.style.display = "none";}
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function(event) { if (event.target == modal) {modal.style.display = "none";}}
+  }
+
+  </script>
+
+ <!--end modal -->               
                
                <!--td><!-monto gasto->
                  <input id="gasto" name="{{a.first.id}}" type="number" class="form-control {{a.first.id}} gasto-seccion2" value="{{a.first.gasto}}" min="0">
@@ -1274,60 +1313,18 @@ $(document).ready(function(e)
 
                </td>
                <td><!--sub cuenta presupuesto-->
-                 <!--input id="contabilidad_hijo_id" name="{{a.first.id}}" type="text" class="form-control contahijo{{a.first.id}}" value="{{a.first.contabilidad_hijo.nombre|title}}"-->
                    <select id="contabilidad_hijo_id" name="{{a.first.id}}" class="form-control contabilidad_hijo-{{a.first.id}}">
-		       <option value="{{a.first.contabilidad_hijo_id}}" {% if a.first.contabilidad_hijo_id %}selected{% endif %}>{{a.first.contabilidad_hijo.nombre|title}}</option>
+	          	       <option value="{{a.first.contabilidad_hijo_id}}" {% if a.first.contabilidad_hijo_id %}selected{% endif %}>{{a.first.contabilidad_hijo.nombre|title}}</option>
                    </select>
                </td>
-
-               <!--td><!-cuenta supereduc: categoria->
-		  <div class="controls">
-                    <select id="categoria_id" name="{{a.first.id}}" class="form-control categoria-{{a.first.id}}">
-                     {% for i in categoria %} 
-                        <option class="{{forloop.counter}}" value="{{i.id}}" {% if a.first.categoria_id == i.id %}selected{% endif %}>{{i.nombre|title}}</option>
-                     {% endfor %}
-                    </select>          
-                  </div>
-                  <script>
-                  $('select#categoria_id.categoria-{{a.first.id}}').on('change', function(e){
-                        e.preventDefault();
-                        var element = $(this).val();
-                        var id = $(this).attr("name");
-                        $.ajax({    
-                            type: 'GET', url: '/jssubcat/', data:  {catid : element },
-                            success: function(data){
-                                                select = $('#subcategoria_id.subcategoria-{{a.first.id}}');
-                                                $('#subcategoria_id.subcategoria-{{a.first.id}}').empty();
-                                                for (var i in data){
-                                                    console.log(data[i].id + " - " + data[i].nombre);
-                                                    var option = document.createElement('option');
-                                                    option.innerHTML = data[i].nombre;
-                                                    option.value = data[i].id;
-                                                    select.append(option);
-                                                    }
-                                                },
-                              });
-                    });
-                  </script>
-               </td>
-               <td><!-sub cuenta supereduc: subcategoria->
-                   <select id="subcategoria_id" name="{{a.first.id}}" class="form-control subcategoria-{{a.first.id}}">
-                       <option value="{{a.first.subcategoria_id}}" {% if a.first.subcategoria_id %}selected{% endif %}>{{a.first.subcategoria.nombre|title}}</option>
-                   </select>
-               </td-->
             </tr>
           {% endfor %}
           </tbody>
         </table>
 
-<!-- Button -->
-  <!--div class="controls"><a class="btn btn-success" id="addfd" href="#" role="button">Agregar</a></div-->
-  <!--form method="post" id="addfd" action="add/fd">{#% csrf_token %#}<input class=" btn btn-success" type="submit" value="+" ></form-->
 
   <br/>
   <button id="addfd" data-id="{{rid.id}}" class="fd btn btn-primary" type="button">Agregar</button>
-
-  <!--a href="{% url 'addfd' %}?rid={{rid.id}}" class="btn btn-success" type="button" onclick="document.getElementById('form-f200').submit();">Agregar</a-->
 
 <!--js del fd-->
   <script type="text/javascript">
