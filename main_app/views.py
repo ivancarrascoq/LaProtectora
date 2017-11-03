@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from .models import *
 from .forms import LoginForm, EditForm
 from django.contrib.auth import authenticate, login, logout
-
+ 
 import datetime
 import numpy as np
 import json 
@@ -242,7 +242,7 @@ def addfdjs(request):
     new_date = Rendicion.objects.get(id = rid).fecha_subida.replace(day=1)
     print new_date
     fd = FondoDetalle.objects.create(cheque = 2, categoria_id = 55, contabilidad_id = 24, contabilidad_hijo_id = 57,
-         doc_tipo_id = '19', proveedor_id = '1000', subcategoria_id = 234, doc_fecha = new_date,
+         doc_tipo_id = '19', proveedor_id = '1000', proveedor_nombre = '-', proveedor_rut = '-', subcategoria_id = 234, doc_fecha = new_date,
          doc_fecha_pago = new_date, doc_monto = 0, gasto = 0)
     fd_id = str(fd.id)
     print 'FondoDetalle.id: ' + str(fd_id)

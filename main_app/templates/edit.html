@@ -165,7 +165,7 @@
       <div class="panel-group col-sm-2">
         <div class="panel panel-primary">
           <div class="panel-heading"><h3>Falta por rendir:</h3></div>
-          <div class="panel-body"><h2>$ <span class="total-sum">{{xrendir}}</span></h2></div>
+          <div class="panel-body"><h2>$ <span class="total-sum" style="font-size: 30px;">{{xrendir}}</span></h2></div>
         </div>
       </div>
         <script>
@@ -1167,8 +1167,8 @@
                <td><!--nombre proveedor-->
                  <input readonly id="proveedor_nombre-{{a.first.id}}" name="{{a.first.id}}" type="text" class="form-control" style="width: 300px;"
                  value=
-                   {% if a.first.proveedor_nombre == None %}
-                     ""
+                   {% if a.first.proveedor_nombre == None or a.first.proveedor_nombre == '-' %}
+                     "-"
                    {% else %}   
                      "{{a.first.proveedor_nombre}}"
                    {% endif %}
