@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% load humanize %}
-
+ 
 {% block content%}
   {% if user.is_authenticated %}
   <link href="{% static 'chosen/docsupport/style.css' %}" rel="stylesheet">
@@ -231,8 +231,9 @@
               <th>No. de Documento</th>    
               <th>Fecha documento</th>    
               <th>Fecha de pago</th>    
-              <th>Descripci&oacute;n del gasto</th>    
-              <th>Rut Proveedor <i>(xxxxxxxx-x)</i></th>    
+              <th>Descripci&oacute;n del gasto</th> 
+              <th>Editar Proveedor</th>   
+              <th>Rut Proveedor</th>    
               <th>Nombre Proveedor</th>    
               <th>Monto Documento</th>    
               <th>Monto Gasto</th>    
@@ -381,8 +382,11 @@
                    {% endif %}
                  >
                </td>
+               <!--modal-->
+               <td style="text-align: center;"><a onclick="proveedormodal({{a.first.id}})" id="myBtn-{{a.first.id}}" ><span class="glyphicon glyphicon-edit"></span></a></td>
+               <!--endmodal-->
                <td><!--rut proveedor-->
-                 <input readonly id="proveedor_rut-{{a.first.id}}" name="{{a.first.id}}" type="text" class="form-control" 
+                 <input readonly id="proveedor_rut-{{a.first.id}}" name="{{a.first.id}}" type="text" class="form-control" style="width: 110px;"
                   pattern="^\d{7,8}-[0-9-,k]{1}$" value=
                    {% if a.first.proveedor_rut == None %}
                      ""
@@ -391,60 +395,67 @@
                    {% endif %}
                </td>
                <td><!--nombre proveedor-->
-                 <!--input id="proveedor_nombre" name="{{a.first.id}}" type="text" class="form-control" value=
+                 <input readonly id="proveedor_nombre-{{a.first.id}}" name="{{a.first.id}}" type="text" class="form-control" style="width: 300px;"
+                 value=
                    {% if a.first.proveedor_nombre == None %}
                      ""
                    {% else %}   
-                     "{{a.first.proveedor_nombre|title}}"
+                     "{{a.first.proveedor_nombre}}"
                    {% endif %}
-               >-->
-               <div class="controls">
-                  <select id="proveedor_nombre-{{a.first.id}}" name="{{a.first.id}}" class="form-control" onchange="proveedor_fill({{a.first.id}})">
-                    {% for i in proveedores %} 
+                >
+               <!--div class="controls">
+                  <select id="proveedor_nombre-{{a.first.id}}" name="{{a.first.id}}" class="form-control" onchange="proveedor_fill({{a.first.id}},value)">
+                    {#% for i in proveedores %#} 
                        <option class="{{forloop.counter}}" value="{{i.id}}|{{i.rut}}"
-                       {% if a.first.proveedor_id == i.id %}selected{% endif %}
+                       {#% if a.first.proveedor_id == i.id %#}selected{#% endif %#}
                        >{{i.nombre}}</option>
-                    {% endfor %}
-
-                    
-                  </select>          
-                </div>
+                    {#% endfor %#}
+                  </select>
+                </div-->
                 
  <!--modal -->
+
  <style>
   /* The Modal (background) */
-  .modal {display: none; /* Hidden by default */position: fixed; /* Stay in place */z-index: 1; /* Sit on top */padding-top: 100px; /* Location of the box */  left: 0;top: 0;width: 100%; /* Full width */height: 100%; /* Full height */overflow: auto; /* Enable scroll if needed */  background-color: rgb(0,0,0); /* Fallback color */background-color: rgba(0,0,0,0.4); /* Black w/ opacity */  }   /* Modal Content */  
-  .modal-content {background-color: #fefefe;margin: auto;padding: 20px;border: 1px solid #888;width: 80%;}    /* The Close Button */  
-  .close-{{a.first.id}} {color: #aaaaaa;float: right;font-size: 28px;font-weight: bold;}  
-  .close-{{a.first.id}}:hover,  .close-{{a.first.id}}:focus {color: #000;text-decoration: none;cursor: pointer;}  
+  .modalp {display: none; /* Hidden by default */position: fixed; /* Stay in place */z-index: 1; /* Sit on top */padding-top: 100px; /* Location of the box */  left: 0;top: 0;width: 100%; /* Full width */height: 100%; /* Full height */overflow: auto; /* Enable scroll if needed */  background-color: rgb(0,0,0); /* Fallback color */background-color: rgba(0,0,0,0.4); /* Black w/ opacity */  }   /* Modal Content */  
+  .modalp-content {background-color: #fefefe;margin: auto;padding: 20px;border: 1px solid #888;width: 80%;}    /* The Close Button */  
+  .close-{{a.first.id}} {color: #aaaaaa;float: right;font-size: 28px;font-weight: bold;}  .close-{{a.first.id}}:hover,  .close-{{a.first.id}}:focus {color: #000;text-decoration: none;cursor: pointer;}  
   </style>
 <!-- Trigger/Open The Modal -->
 <!--button id="myBtn-{{a.first.id}}">Open Modal</button-->
-<button onclick="proveedormodal({{a.first.id}})" id="myBtn-{{a.first.id}}" style="display:none;">Open Modal</button>
 
 
 <!-- The Modal -->
-<div id="myModal-{{a.first.id}}" class="modal"><!-- Modal content -->
-  <div class="modal-content"><span class="close-{{a.first.id}}">&times;</span>
-    <p>id registro: {{a.first.id}}
+<div id="myModal-{{a.first.id}}" class="modalp"><!-- Modal content -->
+  <div class="modalp-content">
+    <span class="close-{{a.first.id}}">&times;</span>
+
+    <p><!--id registro: {{a.first.id}}--><h3>Seleccione un proveedor:</h3>
                <!--div class="controls"-->
-                  <select data-placeholder="Seleccione proveedor..." class="chosen-select" tabindex="2"  >
+                  <select data-placeholder="Seleccione proveedor..." class="chosen-select" tabindex="2" onchange="chosen_fill_p({{a.first.id}},value)" >
                     {% for i in proveedores %} 
-                       <option class="{{forloop.counter}}" value="{{i.id}}" >{{i.nombre}}</option>
+                       <option class="{{forloop.counter}}" value="{{i.id}}|{{i.rut}}|{{i.nombre}}"
+                       {% if a.first.proveedor_id == i.id %}selected{% endif %}
+                       >{{i.nombre}} - {{i.rut}}</option>
                     {% endfor %}
                   </select>          
                 <!--/div-->
     </p>
+    <!--button type="submit" class="btn btn-primary" id="actualizar">Grabar</button-->
   </div>
 </div>
 
-
-
 <script>
+  function chosen_fill_p(reg_id,proveedor_id){
+    console.log(reg_id + ' - ' + proveedor_id);
+    $("#proveedor_nombre-"+reg_id).val(proveedor_id.split("|")[2]);
+    $("#proveedor_rut-"+reg_id).val(proveedor_id.split("|")[1]);
+
+  }
   function proveedormodal(a){
     event.preventDefault();
   // Get the modal
-  //console.log(a);
+  //console.log("registro: "+a);
   var modal = document.getElementById('myModal-'+a);
   modal.style.display = "block";
   // Get the button that opens the modal
@@ -1548,11 +1559,14 @@ $(document).ready(function(e)
   <script src="{% static 'chosen/docsupport/prism.js' %}" type="text/javascript" charset="utf-8"></script>
   <script src="{% static 'chosen/docsupport/init.js' %}" type="text/javascript" charset="utf-8"></script>
   <script>
-    function proveedor_fill(id){
+    function proveedor_fill(id,value){
       var a = $("#proveedor_nombre-"+id).val();
       var rut = a.split("|")[1];
       console.log(id+","+rut);
       $("#proveedor_rut-"+id).val(rut);
+      //value = value.split("|")[0];
+      //console.log(value);
+      //$(".chosen-select option[value="+value+"]").attr("selected","selected");
     };
   </script>
 {% endblock %}

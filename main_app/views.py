@@ -373,6 +373,7 @@ def save_rendicion(request):
             if type(i) == int and i > 0:
 #                print 'ID fondos - seccion II: ' + str(i)
                 print form[str(i)]
+                print 'registro 10:', form[str(i)][10]
 #                print '########cheque###########' + form[str(i)][0]
                 FondoDetalle.objects.filter(id = i).update(
                  categoria_id = form[str(i)][0],
@@ -385,9 +386,10 @@ def save_rendicion(request):
                  doc_fecha_pago = form[str(i)][7],
                  doc_detalle = form[str(i)][8],
                  proveedor_rut = form[str(i)][9],
-                 #proveedor_nombre = form[str(i)][10],
-                 proveedor_nombre = Proveedor.objects.get(id=(form[str(i)][10].split("|")[0])).nombre,
-                 proveedor_id = form[str(i)][10].split("|")[0],
+                 proveedor_nombre = form[str(i)][10],
+                 #proveedor_nombre = Proveedor.objects.get(id=(form[str(i)][10].split("|")[0])).nombre,
+                 #proveedor_id = form[str(i)][10].split("|")[0],
+                 proveedor_id = Proveedor.objects.filter(rut = form[str(i)][9]).first().id,
                  #
                  gasto = form[str(i)][12],
                  doc_monto = form[str(i)][11],
