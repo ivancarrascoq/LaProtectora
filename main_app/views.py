@@ -216,10 +216,26 @@ def edit(request, rid):
     xrendir = rid.monto - sum_gasto - sum_dev
     proveedores = Proveedor.objects.all().order_by('nombre')
     #print 'proveedores',proveedores
+
+    #fechas limites inferiores
+    one_month = datetime.timedelta(30)
+    now = datetime.date.today()
+    date_low_limit = (now - one_month).strftime("%Y-%m-%d")
+    date_low_month = (now - one_month).strftime("%m")
+    if now.month == 12:
+      mes = mes['noviembre','diciembre','enero']
+    elif now.month == 1:
+      mes = ['diciembre','enero','febrero']
+    else:
+      mes = mes[int(date_low_month)-1:int(date_low_month)+2]
+    #mes = mes[int(date_low_month)-1:]
+
+
+
     return render(request, 'edit.html', {'centrocosto': centrocosto, 'mes': mes, 'tipofondo': tipofondo, 
     'subvencion': subvencion, 'rid': rid, 'rall':rall, 'rfd_array': rfd_array, 'rgd_array': rgd_array,
     'cheque': cheque, 'doctipo': doctipo, 'contabilidad': contabilidad, 'categoria': categoria,
-    'xrendir': xrendir, 'close_rid': close_rid, 'proveedores': proveedores })
+    'xrendir': xrendir, 'close_rid': close_rid, 'proveedores': proveedores, 'min': date_low_limit })
 
 def addfd(request):
     print 'Add FD:'
@@ -298,11 +314,24 @@ def new(request):
     #rendicion = Rendicion.objects.all()
     #centrocosto = CentroCosto.objects.all()
     centrocosto = UsersCentroCostos.objects.select_related('user','centro_costo').filter(user_id = user.id)
-
     mes = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
+    #print mes[11]
     tipofondo = TipoFondo.objects.all()
     subvencion = Subvencion.objects.all()
-    return render(request, 'new.html', {'centrocosto': centrocosto, 'mes': mes, 'tipofondo': tipofondo, 'subvencion': subvencion})
+
+    one_month = datetime.timedelta(30)
+    #now = datetime.date.now().strftime("%Y-%m-%d") 
+    now = datetime.date.today()#.strftime("%Y-%m-%d")
+    date_low_limit = (now - one_month).strftime("%Y-%m-%d")
+    date_low_month = (now - one_month).strftime("%m")
+    if now.month == 12:
+      mes = mes['noviembre','diciembre','enero']
+    elif now.month == 1:
+      mes = ['diciembre','enero','febrero']
+    else:
+      mes = mes[int(date_low_month)-1:int(date_low_month)+2]
+
+    return render(request, 'new.html', {'centrocosto': centrocosto, 'mes': mes, 'tipofondo': tipofondo, 'subvencion': subvencion, 'min': date_low_limit })
 
 
 
@@ -361,19 +390,20 @@ def post_rendicion(request):
 def save_rendicion(request):
     form = request.POST
     rid =  form['rid']
-#    print 'Rendicion: ' + str(rid)
-#    print '===== SAVE Rendicion ====='
-#    print form
-#    print '--------values()--------'
+    #print 'Rendicion: ' + str(rid)
+    #print '===== SAVE Rendicion ====='
+    #print form
+    #print '--------values()--------'
     form = dict(form.iterlists())
+    
     for i in form:
         try:
 	    i = int(i)
 #seccion II
             if type(i) == int and i > 0:
 #                print 'ID fondos - seccion II: ' + str(i)
-                print form[str(i)]
-                print 'registro 10:', form[str(i)][10]
+                #print form[str(i)]
+                #print 'registro',i,':', form[str(i)]#[10]
 #                print '########cheque###########' + form[str(i)][0]
                 FondoDetalle.objects.filter(id = i).update(
                  categoria_id = form[str(i)][0],

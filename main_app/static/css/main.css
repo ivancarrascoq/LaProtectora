@@ -62,7 +62,7 @@ footer {
   height: 60px;
 }
 
-div.col-md-11, div.col-sm-11 {padding-bottom:20px; background-color: white; min-height:700px;}
+div.col-md-11, div.col-sm-11 {padding-bottom:50px; background-color: white; min-height:700px;}
 
     /* On small screens, set height to 'auto' for sidenav and grid */
 @media screen and (max-width: 767px) {

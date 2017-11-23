@@ -18,7 +18,7 @@
  
       {#% block content %#} 
 
-
+ 
 
 
 <!--#############################edit admin########################-->
@@ -119,7 +119,7 @@
           <label class="control-label" for="textinput">Fecha Rendici&oacute;n/Reembolso</label>
           <div class="controls">
             <input id="fecharendicion" name="0" type="date" placeholder="dd/mm/yyyy"
-            value="{{rid.fecha_subida|date:"Y-m-d"}}"
+            value="{{rid.fecha_subida|date:"Y-m-d"}}" min="{{min}}"
             class="form-control" required>
           </div>
         </div>
@@ -356,7 +356,7 @@
                </script>
 
                <td><!--fecha doc--><!--doc_fecha-->
-                 <input id="doc_fecha" name="{{a.first.id}}" type="date" class="form-control {{a.first.id}} new_date" value="{{a.first.doc_fecha|date:"Y-m-d"}}" /> <!--min="{% now "Y-m-d" %}" -->
+                 <input id="doc_fecha" name="{{a.first.id}}" type="date" class="form-control {{a.first.id}} new_date" value="{{a.first.doc_fecha|date:"Y-m-d"}}" min="{{min}}" /> <!--min="{% now "Y-m-d" %}" -->
                </td>
                <td><!--fecha de pago-->
                  <input id="doc_fecha_pago" name="{{a.first.id}}" type="date" class="form-control {{a.first.id}} new_date_p" value="{{a.first.doc_fecha_pago|date:"Y-m-d"}}" min="{{a.first.doc_fecha|date:"Y-m-d"}}">
@@ -385,7 +385,7 @@
                <td><!--rut proveedor-->
                  <input readonly id="proveedor_rut-{{a.first.id}}" name="{{a.first.id}}" type="text" class="form-control" style="width: 110px;"
                   pattern="^\d{7,8}-[0-9-,k]{1}$" value=
-                   {% if a.first.proveedor_rut == None %}
+                   {% if a.first.proveedor_rut == '-' %}
                      ""
                    {% else %}   
                      "{{a.first.proveedor_rut}}">
@@ -394,7 +394,7 @@
                <td><!--nombre proveedor-->
                  <input readonly id="proveedor_nombre-{{a.first.id}}" name="{{a.first.id}}" type="text" class="form-control" style="width: 300px;"
                  value=
-                   {% if a.first.proveedor_nombre == None %}
+                   {% if a.first.proveedor_nombre == '-' %}
                      ""
                    {% else %}   
                      "{{a.first.proveedor_nombre}}"
@@ -850,8 +850,8 @@
 	  <div class="controls">
               <select id="centro_costo" name="0" class="form-control">
                 {% for i in centrocosto %}
-                  <option value="{{i.id}}"
-                  {% if rid.centro_costo_id == i.id %}selected{% endif %}
+                  <option value="{{i.centro_costo_id}}"
+                  {% if rid.centro_costo_id == i.centro_costo_id %}selected{% endif %}
                   >{{ i.centro_costo.nombre }}</option>
                 {% endfor %}
               </select>
@@ -1158,7 +1158,7 @@
                <td><!--rut proveedor-->
                  <input readonly id="proveedor_rut-{{a.first.id}}" name="{{a.first.id}}" type="text" class="form-control" style="width: 110px;"
                   pattern="^\d{7,8}-[0-9-,k]{1}$" value=
-                   {% if a.first.proveedor_rut == None %}
+                   {% if a.first.proveedor_rut == '-' %}
                      ""
                    {% else %}   
                      "{{a.first.proveedor_rut}}">
@@ -1167,8 +1167,8 @@
                <td><!--nombre proveedor-->
                  <input readonly id="proveedor_nombre-{{a.first.id}}" name="{{a.first.id}}" type="text" class="form-control" style="width: 300px;"
                  value=
-                   {% if a.first.proveedor_nombre == None or a.first.proveedor_nombre == '-' %}
-                     "-"
+                   {% if a.first.proveedor_nombre == '-' %}
+                     ""
                    {% else %}   
                      "{{a.first.proveedor_nombre}}"
                    {% endif %}

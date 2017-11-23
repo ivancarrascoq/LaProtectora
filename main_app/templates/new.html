@@ -23,7 +23,7 @@
           <p>Lorem ipsum...</p>             
         </div>   
       {#% endblock %#}
-
+ 
       {#% block menuright %#}
         <div class="col-sm-2 sidenav">
           <div class="well">
@@ -92,7 +92,8 @@
           <div class="form-group">
             <label class="control-label col-sm-2" for="fecharendicion">Fecha Rendici&oacute;n / Reembolso</label>
             <div class="col-sm-10">
-              <input id="fecharendicion" name="fecharendicion" type="date" placeholder="dd/mm/yyyy" class="form-control" required>
+              <input id="fecharendicion" min="{{min}}" name="fecharendicion" type="date" placeholder="dd/mm/yyyy" class="form-control" required>
+             
             </div>
           </div>
 
