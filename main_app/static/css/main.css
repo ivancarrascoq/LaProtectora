@@ -5,7 +5,7 @@ div.container-fluid {height:100%; /*background-color:#edebf5;*/ }
 a.active {font-weight: bold; text-decoration:underline;}
 
 .panel-heading {    padding: 1px 15px;}
-.panel-body {    padding: 0px 15px;}
+.panel-body {    /*padding: 0px 15px;*/}
 
 /*.gradiente {
     background: radial-gradient(ellipse 75em 55em at top, #F44336, #ee0979);
