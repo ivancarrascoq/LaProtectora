@@ -229,13 +229,13 @@ def edit(request, rid):
     else:
       mes = mes[int(date_low_month)-1:int(date_low_month)+2]
     #mes = mes[int(date_low_month)-1:]
-
+    min_fecha_doc = (rid.fecha_subida - one_month).strftime("%Y-%m-%d")
 
 
     return render(request, 'edit.html', {'centrocosto': centrocosto, 'mes': mes, 'tipofondo': tipofondo, 
     'subvencion': subvencion, 'rid': rid, 'rall':rall, 'rfd_array': rfd_array, 'rgd_array': rgd_array,
     'cheque': cheque, 'doctipo': doctipo, 'contabilidad': contabilidad, 'categoria': categoria,
-    'xrendir': xrendir, 'close_rid': close_rid, 'proveedores': proveedores, 'min': date_low_limit })
+    'xrendir': xrendir, 'close_rid': close_rid, 'proveedores': proveedores, 'min': date_low_limit, 'min_fecha_doc': min_fecha_doc })
 
 def addfd(request):
     print 'Add FD:'

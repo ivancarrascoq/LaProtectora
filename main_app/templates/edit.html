@@ -353,7 +353,7 @@
                     $('.new_date').val(new_date);
                     $('.new_date_p').val(new_date);
                     $('.new_date').attr("min",new_date_min);    //  fecha doc min
-                    $('.new_date_p').attr("min",new_date_min);  // fecha pago min
+                    $('.new_date_p').attr("min",new_date_min);  // fecha pago min 
 
                     var new_date_max = fecha[0] + "-" + fecha[1] + "-" + fecha[2];
                     $('.new_date').attr("max",new_date_max);            //fecha doc max
@@ -362,13 +362,13 @@
                </script>
 
                <td><!--fecha doc--><!--doc_fecha-->
-                 <input id="doc_fecha" name="{{a.first.id}}" type="date" class="form-control {{a.first.id}} new_date" value="{{a.first.doc_fecha|date:"Y-m-d"}}" min="{{min}}"
-                 max="{{rid.fecha_subida|date:"Y-m-d"}}" /> <!--min="{% now "Y-m-d" %}" -->
+                 <input id="doc_fecha" name="{{a.first.id}}" type="date" class="form-control {{a.first.id}} new_date" value="{{a.first.doc_fecha|date:"Y-m-d"}}" 
+                 min="{{min_fecha_doc}}" max="{{rid.fecha_subida|date:"Y-m-d"}}" /> <!--min="{% now "Y-m-d" %}" -->
                </td>
 
                <td><!--fecha de pago-->
-                 <input id="doc_fecha_pago" name="{{a.first.id}}" type="date" class="form-control {{a.first.id}} new_date_p" value="{{a.first.doc_fecha_pago|date:"Y-m-d"}}" min="{{a.first.doc_fecha|date:"Y-m-d"}}"
-                 max="{{rid.fecha_subida|date:"Y-m-d"}}" />
+                 <input id="doc_fecha_pago" name="{{a.first.id}}" type="date" class="form-control {{a.first.id}} new_date_p" value="{{a.first.doc_fecha_pago|date:"Y-m-d"}}" 
+                 min="{{a.first.doc_fecha|date:"Y-m-d"}}" max="{{rid.fecha_subida|date:"Y-m-d"}}" />
                </td>
                <script>
                 $(document.body).on('change','#doc_fecha.{{a.first.id}}', function() {
@@ -1128,10 +1128,11 @@
                     var new_date = fecha[0] + "-" + fecha[1] + "-" + "01";
                     var mes = fecha[1] - 1;
                     if (mes < 10) { mes = '0' + mes; };
+                    //console.log(mes);
                     var new_date_min = fecha[0] + "-" + mes + "-" + "01";
                     //console.log(new_date_min);
-                    $('.new_date').val(new_date);                                        
-                    $('.new_date_p').val(new_date);
+                //    $('.new_date').val(new_date);                                        
+                //    $('.new_date_p').val(new_date);
                     $('.new_date').attr("min",new_date_min);             //fecha doc dentro del mismo mes      
                     $('.new_date_p').attr("min",new_date_min);          //fecha pago dentro del mismo mes
 
@@ -1142,12 +1143,12 @@
                </script>
 
                <td><!--fecha doc--><!--doc_fecha-->
-                 <input id="doc_fecha" name="{{a.first.id}}" type="date" class="form-control {{a.first.id}} new_date" value="{{a.first.doc_fecha|date:"Y-m-d"}}" min="{{min}}"
-                 max="{{rid.fecha_subida|date:"Y-m-d"}}" />
+                 <input id="doc_fecha" name="{{a.first.id}}" type="date" class="form-control {{a.first.id}} new_date" value="{{a.first.doc_fecha|date:"Y-m-d"}}" 
+                 min="{{min_fecha_doc}}" max="{{rid.fecha_subida|date:"Y-m-d"}}" />
                </td>
                <td><!--fecha de pago-->
-                 <input id="doc_fecha_pago" name="{{a.first.id}}" type="date" class="form-control {{a.first.id}} new_date_p" value="{{a.first.doc_fecha_pago|date:"Y-m-d"}}" min="{{a.first.doc_fecha|date:"Y-m-d"}}"
-                 max="{{rid.fecha_subida|date:"Y-m-d"}}" />
+                 <input id="doc_fecha_pago" name="{{a.first.id}}" type="date" class="form-control {{a.first.id}} new_date_p" value="{{a.first.doc_fecha_pago|date:"Y-m-d"}}" 
+                 min="{{a.first.doc_fecha|date:"Y-m-d"}}" max="{{rid.fecha_subida|date:"Y-m-d"}}" />
                </td>
 	       <script>
 		$(document.body).on('change','#doc_fecha.{{a.first.id}}', function() {
