@@ -1,5 +1,5 @@
 # LaProtectora
-F200
+##F200
 
 check django version:
 
@@ -7,14 +7,19 @@ python -m django --version
 
 if not installed:
 
-pip install django
+**pip install django**
 
 
 To clone repository:
 
-'''git clone https://github.com/ivancarrascoq/LaProtectora'''
+**git clone https://github.com/ivancarrascoq/LaProtectora**
 
-mysql -u root -p < laprotectora.sql
-pip install numpy
-pip install unicodecsv
-pip install xlwt
+**mysql -u root -p < laprotectora.sql**
+
+**pip install numpy**
+
+**pip install unicodecsv**
+
+**pip install xlwt**
+
+ _python2.7 manage.py runserver 0:8000_
