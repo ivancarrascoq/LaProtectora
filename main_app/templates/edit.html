@@ -247,6 +247,7 @@
           {% if not rfd_array %}<tr><td colspan="16" style="text-align: center;">No se encontraron registros</td></tr>{% endif %}
 
           {% for a in rfd_array %}
+
             <tr class="{{a.first.id}}">
                <th>{{ forloop.counter }}</th>
                <td>
@@ -346,7 +347,7 @@
                 $(document.body).on('change','#fecharendicion', function() {
                     var fecha = $('#fecharendicion').val().split('-');
 		                var new_date = fecha[0] + "-" + fecha[1] + "-" + "01";
-                    var mes = fecha[1] - 1;
+                    var mes = fecha[1] - 2;
                     if (mes < 10) { mes = '0' + mes; };
                     var new_date_min = fecha[0] + "-" + mes + "-" + "01";
                     /*console.log(new_date);*/
@@ -1126,7 +1127,7 @@
                     var fecha = $('#fecharendicion').val().split('-');
                     /*console.log(fecha[1]);console.log(fecha[0]);*/
                     var new_date = fecha[0] + "-" + fecha[1] + "-" + "01";
-                    var mes = fecha[1] - 1;
+                    var mes = fecha[1] - 2;
                     if (mes < 10) { mes = '0' + mes; };
                     //console.log(mes);
                     var new_date_min = fecha[0] + "-" + mes + "-" + "01";

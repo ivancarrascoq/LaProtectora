@@ -24,6 +24,7 @@ SECRET_KEY = '4+yr2m7eus(x_bs!v-496@!jpvg!nqro7f=x)#r8!706t53k9u'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+#DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -89,7 +90,7 @@ DATABASES = {
 #        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'laprotectora',
-        'USER': 'root',
+        'USER': 'lpi',
         'PASSWORD': 'solide123,,',                            
         'HOST': 'localhost',
         'PORT': '3306',
@@ -139,7 +140,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
+STATIC_ROOT = 'LaProtectora/LaProtectora/main_app/static/'
 STATIC_URL = '/static/'
+#
+#STATICFILES_DIRS = (
+#  os.path.join(SITE_ROOT, 'static/'),
+#)
 #
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

@@ -111,10 +111,10 @@ def edit(request, rid):
     rfd_array = list()#range(rfd_count))
     for j in rfd:##        print 'RFD '+str(j.id)+' fondo_id: '+str(j.fondos_detalles_id)+', rendicion id: '+str(j.rendicion_id)
       rfd_array.append(FondoDetalle.objects.select_related('doc_tipo','proveedor','contabilidad', 'contabilidad_hijo','categoria','subcategoria').filter(id = int(j.fondos_detalles_id)))
- #     print 'test',FondoDetalle.objects.select_related('doc_tipo','proveedor','contabilidad', 'contabilidad_hijo','categoria','subcategoria').filter(j.fondos_detalles_id)
-#        rfd_array.append(FondoDetalle.objects.select_related('doc_tipo').select_related('proveedor').#        select_related('contabilidad').select_related('contabilidad_hijo').#        select_related('categoria').select_related('subcategoria').#        filter(id = int(j.fondos_detalles_id)))##    print rfd_array##    print "for in array"#    for a in rfd_array:#        print a[0]    #gasto: devolucion
+      #     print 'test',FondoDetalle.objects.select_related('doc_tipo','proveedor','contabilidad', 'contabilidad_hijo','categoria','subcategoria').filter(j.fondos_detalles_id)
+      #        rfd_array.append(FondoDetalle.objects.select_related('doc_tipo').select_related('proveedor').#        select_related('contabilidad').select_related('contabilidad_hijo').#        select_related('categoria').select_related('subcategoria').#        filter(id = int(j.fondos_detalles_id)))##    print rfd_array##    print "for in array"#    for a in rfd_array:#        print a[0]    #gasto: devolucion
     print rfd_array
-#restricciones para cerrar rendicion
+    #restricciones para cerrar rendicion
     close_rid = 0
     close_rid_f = 0
     close_rid_g = 0
@@ -219,6 +219,7 @@ def edit(request, rid):
 
     #fechas limites inferiores
     one_month = datetime.timedelta(30)
+    two_month = datetime.timedelta(60)
     now = datetime.date.today()
     date_low_limit = (now - one_month).strftime("%Y-%m-%d")
     date_low_month = (now - one_month).strftime("%m")
@@ -227,9 +228,9 @@ def edit(request, rid):
     elif now.month == 1:
       mes = ['diciembre','enero','febrero']
     else:
-      mes = mes[int(date_low_month)-1:int(date_low_month)+2]
+      mes = mes[int(date_low_month)-3:int(date_low_month)+2]
     #mes = mes[int(date_low_month)-1:]
-    min_fecha_doc = (rid.fecha_subida - one_month).strftime("%Y-%m-%d")
+    min_fecha_doc = (rid.fecha_subida - two_month).strftime("%Y-%m-%d")
 
 
     return render(request, 'edit.html', {'centrocosto': centrocosto, 'mes': mes, 'tipofondo': tipofondo, 
@@ -329,7 +330,7 @@ def new(request):
     elif now.month == 1:
       mes = ['diciembre','enero','febrero']
     else:
-      mes = mes[int(date_low_month)-1:int(date_low_month)+2]
+      mes = mes[int(date_low_month)-3:int(date_low_month)+2]
 
     return render(request, 'new.html', {'centrocosto': centrocosto, 'mes': mes, 'tipofondo': tipofondo, 'subvencion': subvencion, 'min': date_low_limit })
 
@@ -777,13 +778,14 @@ def post_filter(request):
       writer = csv.writer(response)
       writer.writerow(['RBD','Subvencion','Codigo Sub-Cuenta','Codigo Documento','No. documento','fecha documento','fecha de pago',
 	'Descripcion del gasto','Rut Proveedor','Nombre Proveedor','Monto Gasto','Monto Documento','Cuenta Presupuesto',
-	'Sub Cuenta Presupuesto','Efectivo/Cheque'])
+	'Sub Cuenta Presupuesto','Efectivo/Cheque','# Rendicion'])
       print '--------csv--------'
       for j in query_filter:
-        if j.fondos_detalles.cheque == 1:
+        if j.fondos_detalles.cheque == '1':
           che_efe = 'Cheque'
         else:
           che_efe = 'Efectivo'
+        print che_efe
         writer.writerow([CentroCosto.objects.get(id = j.rendicion.centro_costo_id).rbd, Subvencion.objects.get(id=j.rendicion.subvencion_id).nombre,
                 Subcategoria.objects.get(id=j.fondos_detalles.subcategoria_id).code, DocTipo.objects.get(id = j.fondos_detalles.doc_tipo_id).sigla ,
                 j.fondos_detalles.doc_no , j.fondos_detalles.doc_fecha.strftime("%d-%m-%Y") ,j.fondos_detalles.doc_fecha_pago.strftime("%d-%m-%Y") ,
@@ -803,7 +805,7 @@ def post_filter(request):
 
       columns = ['RBD','Subvencion','Codigo Sub-Cuenta','Codigo Documento','No. documento','fecha documento','fecha de pago',
         'Descripcion del gasto','Rut Proveedor','Nombre Proveedor','Monto Gasto','Monto Documento','Cuenta Presupuesto',
-        'Sub Cuenta Presupuesto','Efectivo/Cheque']
+        'Sub Cuenta Presupuesto','Efectivo/Cheque','# Rendicion']
 
       for col_num in range(len(columns)):
         ws.write(row_num, col_num, columns[col_num], font_style)
@@ -820,11 +822,14 @@ def post_filter(request):
       #ContabilidadHijo.objects.get(id=j.fondos_detalles.contabilidad_hijo_id).nombre ,che_efe]
       for j in query_filter:
         row_num += 1
-        if j.fondos_detalles.cheque == 1:
+        if j.fondos_detalles.cheque == '1':
           che_efe = 'Cheque'
         else:
           che_efe = 'Efectivo'
-        row = [CentroCosto.objects.get(id = j.rendicion.centro_costo_id).rbd, Subvencion.objects.get(id=j.rendicion.subvencion_id).nombre, Subcategoria.objects.get(id=j.fondos_detalles.subcategoria_id).code, DocTipo.objects.get(id = j.fondos_detalles.doc_tipo_id).sigla ,j.fondos_detalles.doc_no , j.fondos_detalles.doc_fecha.strftime("%d-%m-%Y") ,j.fondos_detalles.doc_fecha_pago.strftime("%d-%m-%Y") ,j.fondos_detalles.doc_detalle ,j.fondos_detalles.proveedor_rut ,j.fondos_detalles.proveedor_nombre , j.fondos_detalles.gasto,j.fondos_detalles.doc_monto ,Contabilidad.objects.get(id=j.fondos_detalles.contabilidad_id).nombre ,ContabilidadHijo.objects.get(id=j.fondos_detalles.contabilidad_hijo_id).nombre ,che_efe]
+        rend_no1 = RendicionesFondosDetalles.objects.get(id = j.fondos_detalles.id).rendicion_id
+        #print rend_no1
+        rend_no = '-'
+        row = [CentroCosto.objects.get(id = j.rendicion.centro_costo_id).rbd, Subvencion.objects.get(id=j.rendicion.subvencion_id).nombre, Subcategoria.objects.get(id=j.fondos_detalles.subcategoria_id).code, DocTipo.objects.get(id = j.fondos_detalles.doc_tipo_id).sigla ,j.fondos_detalles.doc_no , j.fondos_detalles.doc_fecha.strftime("%d-%m-%Y") ,j.fondos_detalles.doc_fecha_pago.strftime("%d-%m-%Y") ,j.fondos_detalles.doc_detalle ,j.fondos_detalles.proveedor_rut ,j.fondos_detalles.proveedor_nombre , j.fondos_detalles.gasto,j.fondos_detalles.doc_monto ,Contabilidad.objects.get(id=j.fondos_detalles.contabilidad_id).nombre ,ContabilidadHijo.objects.get(id=j.fondos_detalles.contabilidad_hijo_id).nombre ,che_efe, rend_no1]
         for col_num in range(len(row)):
             #print row_num, col_num, row[col_num]
             ws.write(row_num, col_num, row[col_num], font_style)
