@@ -15,12 +15,10 @@ To clone repository:
 **git clone https://github.com/ivancarrascoq/LaProtectora**
 
 **mysql -u root -p < laprotectora.sql**
-
-**pip install numpy**
-
-**pip install unicodecsv**
-
-**pip install xlwt**
+**pip install numpy unicodecsv xlwt**
+**pip install pip --upgrade**
+**apt install python-mysqldb**
+**pip install MySQL-python**
 
  _python2.7 manage.py runserver 0:8000_
  

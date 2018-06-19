@@ -1,1 +1,5 @@
 media/
+*.pyc
+LaProtectora/*.pyc
+main_app/*.pyc
+main_app/migrations/*.pyc

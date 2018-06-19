@@ -127,6 +127,27 @@
 		    </tbody>
 		  </table>
 		</form>
+
+<!-- gen2-start -->
+		<form class="form-horizontal" action="../post_filter2" method="post">
+	          {% csrf_token %}
+		  <table class="table-condensed">
+		    <thead>
+		      <tr>
+		        <th>Rendici&oacute;n <i>(las rendiciones pueden estar separadas por coma)</i></th>
+		        <th><!--operador--></th>
+		      </tr>
+		    </thead>
+		    <tbody>
+		      <tr>
+		        <td><input id="rend2" name="rend2" type="text" placeholder="ej: 1,2,3" class="form-control" required></td>
+		        <td><input type="submit" value="Generar" class="btn btn-primary"/></td>
+		      </tr>
+		    </tbody>
+		  </table>
+		</form>
+
+<!-- gen2-end -->
 	       <style>
 		#f_date_s,#f_date_f, #f_cc,#f_sub {width: 150px;}
 		.filter {width: 150px;}

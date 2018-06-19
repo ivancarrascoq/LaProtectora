@@ -39,6 +39,8 @@ urlpatterns = [
     url(r'^lock_rendicion/([0-9]+)/$', views.lock_rendicion, name='lock_rendicion'),
 #post_filter
     url(r'post_filter$', views.post_filter, name='post_filter_csv'),
+#post_filter2
+    url(r'post_filter2$', views.post_filter2, name='post_filter2_csv'),
 #open_rendicion
     url(r'^open_rendicion/([0-9]+)/$', views.open_rendicion, name='open_rendicion'),
 #admin-users

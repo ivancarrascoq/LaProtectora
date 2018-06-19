@@ -840,7 +840,82 @@ def post_filter(request):
 
     else:
       return HttpResponseRedirect('/')
+##start filtro2
+def post_filter2(request):
+    print 'post_filter2 - xls'
+    user = request.user
+    form = request.POST
+    rend2 = form['rend2'].split(',') #rendicion
+    print rend2
+    print 'tipo: ', type(rend2)
+    if user.is_superuser:
+      try:
+        filtro = user.username.split('@')[1]
+      except:
+        filtro = ''
+    else:
+      return HttpResponseRedirect('/')
+    filtro_users = User.objects.all().filter(username__contains = filtro)
+    query_filter = RendicionesFondosDetalles.objects.select_related('fondos_detalles','rendicion').filter(
+		   rendicion_id__in = rend2, rendicion__user_id__in = filtro_users, rendicion__locked = 1)
+    print 'cantidad de registros encontrados: ', query_filter.count()
+###
+    activate = 2
+    if activate == 1:
+      response = HttpResponse(content_type='text/csv')
+      response['Content-Disposition'] = 'attachment; filename="rendiciones.csv"'
+      writer = csv.writer(response)
+      writer.writerow(['RBD','Subvencion','Codigo Sub-Cuenta','Codigo Documento','No. documento','fecha documento','fecha de pago',
+	'Descripcion del gasto','Rut Proveedor','Nombre Proveedor','Monto Gasto','Monto Documento','Cuenta Presupuesto',
+	'Sub Cuenta Presupuesto','Efectivo/Cheque','# Rendicion'])
+      print '--------csv--------'
+      for j in query_filter:
+        if j.fondos_detalles.cheque == '1':
+          che_efe = 'Cheque'
+        else:
+          che_efe = 'Efectivo'
+        print che_efe
+        writer.writerow([CentroCosto.objects.get(id = j.rendicion.centro_costo_id).rbd, Subvencion.objects.get(id=j.rendicion.subvencion_id).nombre,
+                Subcategoria.objects.get(id=j.fondos_detalles.subcategoria_id).code, DocTipo.objects.get(id = j.fondos_detalles.doc_tipo_id).sigla ,
+                j.fondos_detalles.doc_no , j.fondos_detalles.doc_fecha.strftime("%d-%m-%Y") ,j.fondos_detalles.doc_fecha_pago.strftime("%d-%m-%Y") ,
+                j.fondos_detalles.doc_detalle ,j.fondos_detalles.proveedor_rut ,j.fondos_detalles.proveedor_nombre ,
+                j.fondos_detalles.gasto ,j.fondos_detalles.doc_monto ,Contabilidad.objects.get(id=j.fondos_detalles.contabilidad_id).nombre ,
+                ContabilidadHijo.objects.get(id=j.fondos_detalles.contabilidad_hijo_id).nombre ,che_efe])
+      return response
+    elif activate == 2:
+      print 'activate is 2 -------xls------'
+      response = HttpResponse(content_type='application/ms-excel')
+      response['Content-Disposition'] = 'attachment; filename="rendicion_xls.xls"'
+      wb = xlwt.Workbook(encoding='utf-8')
+      ws = wb.add_sheet('Rendicion')
+      row_num = 0
+      font_style = xlwt.XFStyle()
+      font_style.font.bold = True
+      columns = ['RBD','Subvencion','Codigo Sub-Cuenta','Codigo Documento','No. documento','fecha documento','fecha de pago',
+        'Descripcion del gasto','Rut Proveedor','Nombre Proveedor','Monto Gasto','Monto Documento','Cuenta Presupuesto',
+        'Sub Cuenta Presupuesto','Efectivo/Cheque','# Rendicion']
+      for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+      font_style = xlwt.XFStyle()
+      for j in query_filter:
+        row_num += 1
+        if j.fondos_detalles.cheque == '1':
+          che_efe = 'Cheque'
+        else:
+          che_efe = 'Efectivo'
+        rend_no1 = RendicionesFondosDetalles.objects.get(id = j.fondos_detalles.id).rendicion_id
+        rend_no = '-'
+        row = [CentroCosto.objects.get(id = j.rendicion.centro_costo_id).rbd, Subvencion.objects.get(id=j.rendicion.subvencion_id).nombre, Subcategoria.objects.get(id=j.fondos_detalles.subcategoria_id).code, DocTipo.objects.get(id = j.fondos_detalles.doc_tipo_id).sigla ,j.fondos_detalles.doc_no , j.fondos_detalles.doc_fecha.strftime("%d-%m-%Y") ,j.fondos_detalles.doc_fecha_pago.strftime("%d-%m-%Y") ,j.fondos_detalles.doc_detalle ,j.fondos_detalles.proveedor_rut ,j.fondos_detalles.proveedor_nombre , j.fondos_detalles.gasto,j.fondos_detalles.doc_monto ,Contabilidad.objects.get(id=j.fondos_detalles.contabilidad_id).nombre ,ContabilidadHijo.objects.get(id=j.fondos_detalles.contabilidad_hijo_id).nombre ,che_efe,
+rend_no1]
+        for col_num in range(len(row)):
+            ws.write(row_num, col_num, row[col_num], font_style)
+      wb.save(response)
+      return response
+    else:
+      return HttpResponseRedirect('/')
 
+
+##end filtro2
 def open_rendicion(request,id):
     user = request.user
     if user.is_superuser:
