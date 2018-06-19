@@ -1,4 +1,5 @@
 media/
+*.sql
 *.pyc
 LaProtectora/*.pyc
 main_app/*.pyc
