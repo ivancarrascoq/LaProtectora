@@ -34,3 +34,24 @@ This creates the server in a screen and then detaches it. This way you can simpl
 
 screen -r
 
+-------------------
+**to change admin password via CLI**
+
+[root@CentOS-server]# /usr/local/bin/python2.7 manage.py shell
+>>> from django.contrib.auth.models import User
+>>> user = User.objects.get(username='admin')
+>>> user.set_password('solide123,,')
+>>> user.save()
+
+-------------------
+**to deploy production mode**
+...edit, comment and delete SECRET_KEY and add "with open..." into settings.py
+
+$ nano LaProtectora/settings.py
+#SECRET_KEY = '****'
+with open('/etc/secret_key.txt') as f:
+    SECRET_KEY = f.read().strip()
+
+$ nano /etc/secret_key.txt
+(copy SECRET_KEY without quotes)
+
