@@ -40,7 +40,7 @@ screen -r
 [root@CentOS-server]# /usr/local/bin/python2.7 manage.py shell
 >>> from django.contrib.auth.models import User
 >>> user = User.objects.get(username='admin')
->>> user.set_password('solide123,,')
+>>> user.set_password('admin_pass')
 >>> user.save()
 
 -------------------
