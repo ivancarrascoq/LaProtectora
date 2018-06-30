@@ -247,31 +247,31 @@
           {% if not rfd_array %}<tr><td colspan="16" style="text-align: center;">No se encontraron registros</td></tr>{% endif %}
 
           {% for a in rfd_array %}
-            <tr class="{{a.0.id}}">
+            <tr class="{{a.first.id}}">
                <th>{{ forloop.counter }}</th>
                <td>
-                 <!--a href="{% url 'delfd' %}?rid={{rid.id}}&fd_id={{a.0.id}}"-->
-                 <span data-id="{{a.0.id}}" class="glyphicon glyphicon-trash"></span><!--/a-->
+                 <!--a href="{% url 'delfd' %}?rid={{rid.id}}&fd_id={{a.first.id}}"-->
+                 <span data-id="{{a.first.id}}" class="glyphicon glyphicon-trash"></span><!--/a-->
                </td>
 
                <td><!--cuenta supereduc: categoria-->
                   <div class="controls">
-                    <select id="categoria_id" name="{{a.0.id}}" class="form-control categoria-{{a.0.id}}">
+                    <select id="categoria_id" name="{{a.first.id}}" class="form-control categoria-{{a.first.id}}">
                      {% for i in categoria %} 
-                        <option class="{{forloop.counter}}" value="{{i.id}}" {% if a.0.categoria_id == i.id %}selected{% endif %}>{{i.nombre|title}}</option>
+                        <option class="{{forloop.counter}}" value="{{i.id}}" {% if a.first.categoria_id == i.id %}selected{% endif %}>{{i.nombre|title}}</option>
                      {% endfor %}
                     </select>          
                   </div>
                   <script>
-                  $('select#categoria_id.categoria-{{a.0.id}}').on('change', function(e){
+                  $('select#categoria_id.categoria-{{a.first.id}}').on('change', function(e){
                         e.preventDefault();
                         var element = $(this).val();
                         var id = $(this).attr("name");
                         $.ajax({    
                             type: 'GET', url: '/jssubcat/', data:  {catid : element },
                             success: function(data){
-                                                select = $('#subcategoria_id.subcategoria-{{a.0.id}}');
-                                                $('#subcategoria_id.subcategoria-{{a.0.id}}').empty();
+                                                select = $('#subcategoria_id.subcategoria-{{a.first.id}}');
+                                                $('#subcategoria_id.subcategoria-{{a.first.id}}').empty();
                                                 for (var i in data){
                                                     //console.log(data[i].id + " - " + data[i].nombre);
                                                     var option = document.createElement('option');
@@ -285,11 +285,8 @@
                   </script>
                </td>
                <td><!--sub cuenta supereduc: subcategoria-->
-                   <select id="subcategoria_id" name="{{a.0.id}}" class="form-control subcategoria-{{a.0.id}}">
-                       <option value="{{a.0.subcategoria_id}}" {% if a.0.subcategoria_id %}selected{% endif %}> 
-				{% for subcat in subcategoria %}{% if subcat.id == a.0.subcategoria_id %} {{subcat.nombre|title}} {% endif %}
-				{%endfor%}
-			</option>
+                   <select id="subcategoria_id" name="{{a.first.id}}" class="form-control subcategoria-{{a.first.id}}">
+                       <option value="{{a.first.subcategoria_id}}" {% if a.first.subcategoria_id %}selected{% endif %}>{{a.first.subcategoria.nombre|title}}</option>
                    </select>
                </td>
 
@@ -297,51 +294,51 @@
 
                <td><!--tipo de pago--><!--cheque-->
                  <div class="controls">
-                   <select id="cheque" name="{{a.0.id}}" class="form-control cheque-{{a.0.id}}">
+                   <select id="cheque" name="{{a.first.id}}" class="form-control cheque-{{a.first.id}}">
 			<!--option></option-->
                      {% for i in cheque %}
-                        <option value="{{i.0}}" {% if a.0.cheque == i.0 %}selected{% endif %}>{{i.1}}</option>
+                        <option value="{{i.0}}" {% if a.first.cheque == i.0 %}selected{% endif %}>{{i.1}}</option>
                      {% endfor %}
-                     {% if a.0.cheque is None  %}
+                     {% if a.first.cheque is None  %}
                           <option value="2" selected></option>
                      {% endif %}
                    </select>
                  </div>
                </td>
                 <script>
-                        $('.cheque-{{a.0.id}}').on('change', function(){
+                        $('.cheque-{{a.first.id}}').on('change', function(){
                         if ($(this).val() != 1){
-                            $('.doc_no_cheque-{{a.0.id}}').attr("readonly",true);
-                            $('.doc_no_cheque-{{a.0.id}}').val("");
+                            $('.doc_no_cheque-{{a.first.id}}').attr("readonly",true);
+                            $('.doc_no_cheque-{{a.first.id}}').val("");
                           }
                         else {
-                            $('.doc_no_cheque-{{a.0.id}}').attr("readonly",false);
+                            $('.doc_no_cheque-{{a.first.id}}').attr("readonly",false);
                           }
                         });
                 </script>
                <td><!--no cheque--><!--doc_no_cheque-->
-                 <input id="doc_no_cheque" name="{{a.0.id}}" type="text" class="form-control doc_no_cheque-{{a.0.id}}" value
+                 <input id="doc_no_cheque" name="{{a.first.id}}" type="text" class="form-control doc_no_cheque-{{a.first.id}}" value
 =
-                   {% if a.0.cheque == '2' or a.0.cheque == '0' %}
+                   {% if a.first.cheque == '2' or a.first.cheque == '0' %}
                      "" readonly
                    {% else %}
-                     "{{a.0.doc_no_cheque}}"
+                     "{{a.first.doc_no_cheque}}"
                    {% endif %}
                  > 
 
                </td>
                <td><!--tipo de doc--><!--doc_tipo_id-->
                  <div class="controls">               
-                   <select id="doc_tipo_id" name="{{a.0.id}}" class="form-control">
+                   <select id="doc_tipo_id" name="{{a.first.id}}" class="form-control">
                      {% for i in doctipo %} 
-                        <option value="{{i.id}}" {%if a.0.doc_tipo_id == i.id%}selected{%endif%}>{{i.nombre|title}}</option>
+                        <option value="{{i.id}}" {%if a.first.doc_tipo_id == i.id%}selected{%endif%}>{{i.nombre|title}}</option>
                      {% endfor %}
                    </select>          
                  </div>
                </td>
                <td><!--no. de doc - cod BBDD desde doc tipo id--><!--doc_no-->
-                 <input id="doc_no" name="{{a.0.id}}" type="text" class="form-control" value=
-                   {% if a.0.doc_no == None %}""{% else %}"{{a.0.doc_no}}"{% endif %}
+                 <input id="doc_no" name="{{a.first.id}}" type="text" class="form-control" value=
+                   {% if a.first.doc_no == None %}""{% else %}"{{a.first.doc_no}}"{% endif %}
                  >
                </td>
 
@@ -365,51 +362,51 @@
                </script>
 
                <td><!--fecha doc--><!--doc_fecha-->
-                 <input id="doc_fecha" name="{{a.0.id}}" type="date" class="form-control {{a.0.id}} new_date" value="{{a.0.doc_fecha|date:"Y-m-d"}}" 
+                 <input id="doc_fecha" name="{{a.first.id}}" type="date" class="form-control {{a.first.id}} new_date" value="{{a.first.doc_fecha|date:"Y-m-d"}}" 
                  min="{{min_fecha_doc}}" max="{{rid.fecha_subida|date:"Y-m-d"}}" /> <!--min="{% now "Y-m-d" %}" -->
                </td>
 
                <td><!--fecha de pago-->
-                 <input id="doc_fecha_pago" name="{{a.0.id}}" type="date" class="form-control {{a.0.id}} new_date_p" value="{{a.0.doc_fecha_pago|date:"Y-m-d"}}" 
-                 min="{{a.0.doc_fecha|date:"Y-m-d"}}" max="{{rid.fecha_subida|date:"Y-m-d"}}" />
+                 <input id="doc_fecha_pago" name="{{a.first.id}}" type="date" class="form-control {{a.first.id}} new_date_p" value="{{a.first.doc_fecha_pago|date:"Y-m-d"}}" 
+                 min="{{a.first.doc_fecha|date:"Y-m-d"}}" max="{{rid.fecha_subida|date:"Y-m-d"}}" />
                </td>
                <script>
-                $(document.body).on('change','#doc_fecha.{{a.0.id}}', function() {
-                    var fecha = $('#doc_fecha.{{a.0.id}}').val();
+                $(document.body).on('change','#doc_fecha.{{a.first.id}}', function() {
+                    var fecha = $('#doc_fecha.{{a.first.id}}').val();
                     /*console.log(fecha);*/
-                    $('#doc_fecha_pago.{{a.0.id}}').val(fecha);
-                    $('#doc_fecha_pago.{{a.0.id}}').attr("min",fecha);
+                    $('#doc_fecha_pago.{{a.first.id}}').val(fecha);
+                    $('#doc_fecha_pago.{{a.first.id}}').attr("min",fecha);
                 });
                </script>
 
                <td><!--descripcion del gasto-->
-                 <input id="doc_detalle" name="{{a.0.id}}" type="text" class="form-control" value=
-                   {% if a.0.doc_detalle == None %}
+                 <input id="doc_detalle" name="{{a.first.id}}" type="text" class="form-control" value=
+                   {% if a.first.doc_detalle == None %}
                      ""
                    {% else %}
-                     "{{a.0.doc_detalle}}"
+                     "{{a.first.doc_detalle}}"
                    {% endif %}
                  >
                </td>
                <!--modal-->
-               <td style="text-align: center;"><a onclick="proveedormodal({{a.0.id}})" id="myBtn-{{a.0.id}}" ><span class="glyphicon glyphicon-edit"></span></a></td>
+               <td style="text-align: center;"><a onclick="proveedormodal({{a.first.id}})" id="myBtn-{{a.first.id}}" ><span class="glyphicon glyphicon-edit"></span></a></td>
                <!--endmodal-->
                <td><!--rut proveedor-->
-                 <input readonly id="proveedor_rut-{{a.0.id}}" name="{{a.0.id}}" type="text" class="form-control" style="width: 110px;"
+                 <input readonly id="proveedor_rut-{{a.first.id}}" name="{{a.first.id}}" type="text" class="form-control" style="width: 110px;"
                   pattern="^\d{7,8}-[0-9-,k]{1}$" value=
-                   {% if a.0.proveedor_rut == '-' %}
+                   {% if a.first.proveedor_rut == '-' %}
                      ""
                    {% else %}   
-                     "{{a.0.proveedor_rut}}">
+                     "{{a.first.proveedor_rut}}">
                    {% endif %}
                </td>
                <td><!--nombre proveedor-->
-                 <input readonly id="proveedor_nombre-{{a.0.id}}" name="{{a.0.id}}" type="text" class="form-control" style="width: 300px;"
+                 <input readonly id="proveedor_nombre-{{a.first.id}}" name="{{a.first.id}}" type="text" class="form-control" style="width: 300px;"
                  value=
-                   {% if a.0.proveedor_nombre == '-' %}
+                   {% if a.first.proveedor_nombre == '-' %}
                      ""
                    {% else %}   
-                     "{{a.0.proveedor_nombre}}"
+                     "{{a.first.proveedor_nombre}}"
                    {% endif %}
                 >
                 
@@ -419,23 +416,23 @@
   /* The Modal (background) */
   .modalp {display: none; /* Hidden by default */position: fixed; /* Stay in place */z-index: 1; /* Sit on top */padding-top: 100px; /* Location of the box */  left: 0;top: 0;width: 100%; /* Full width */height: 100%; /* Full height */overflow: auto; /* Enable scroll if needed */  background-color: rgb(0,0,0); /* Fallback color */background-color: rgba(0,0,0,0.4); /* Black w/ opacity */  }   /* Modal Content */  
   .modalp-content {background-color: #fefefe;margin: auto;padding: 20px;border: 1px solid #888;width: 80%;}    /* The Close Button */  
-  .close-{{a.0.id}} {color: #aaaaaa;float: right;font-size: 28px;font-weight: bold;}  .close-{{a.0.id}}:hover,  .close-{{a.0.id}}:focus {color: #000;text-decoration: none;cursor: pointer;}  
+  .close-{{a.first.id}} {color: #aaaaaa;float: right;font-size: 28px;font-weight: bold;}  .close-{{a.first.id}}:hover,  .close-{{a.first.id}}:focus {color: #000;text-decoration: none;cursor: pointer;}  
   </style>
 <!-- Trigger/Open The Modal -->
-<!--button id="myBtn-{{a.0.id}}">Open Modal</button-->
+<!--button id="myBtn-{{a.first.id}}">Open Modal</button-->
 
 
 <!-- The Modal -->
-<div id="myModal-{{a.0.id}}" class="modalp"><!-- Modal content -->
+<div id="myModal-{{a.first.id}}" class="modalp"><!-- Modal content -->
   <div class="modalp-content">
-    <span class="close-{{a.0.id}}">&times;</span>
+    <span class="close-{{a.first.id}}">&times;</span>
 
-    <p><!--id registro: {{a.0.id}}--><h3>Seleccione un proveedor:</h3>
+    <p><!--id registro: {{a.first.id}}--><h3>Seleccione un proveedor:</h3>
                <!--div class="controls"-->
-                  <select data-placeholder="Seleccione proveedor..." class="chosen-select" tabindex="2" onchange="chosen_fill_p({{a.0.id}},value)" >
+                  <select data-placeholder="Seleccione proveedor..." class="chosen-select" tabindex="2" onchange="chosen_fill_p({{a.first.id}},value)" >
                     {% for i in proveedores %} 
                        <option class="{{forloop.counter}}" value="{{i.id}}|{{i.rut}}|{{i.nombre}}"
-                       {% if a.0.proveedor_id == i.id %}selected{% endif %}
+                       {% if a.first.proveedor_id == i.id %}selected{% endif %}
                        >{{i.nombre}} - {{i.rut}}</option>
                     {% endfor %}
                   </select>          
@@ -478,9 +475,9 @@
                 <script>
                     $(document).ready(function(e)
                     {
-                        $('#gasto.{{a.0.id}}').keypress(function(event){
+                        $('#gasto.{{a.first.id}}').keypress(function(event){
                                 var a = $(this).val();
-                                var b = $('#doc_monto.{{a.0.id}}').val();
+                                var b = $('#doc_monto.{{a.first.id}}').val();
                                 if (parseInt(a) > parseInt(b)){
                                         event.preventDefault();
                                         $(this).val(b);
@@ -488,39 +485,39 @@
                                 }
                                 else {}
                         });
-                        $('#gasto.{{a.0.id}}').focusout(function(){
+                        $('#gasto.{{a.first.id}}').focusout(function(){
                                 var a = $(this).val();
-                                var b = $('#doc_monto.{{a.0.id}}').val(); 
+                                var b = $('#doc_monto.{{a.first.id}}').val(); 
                                 if (parseInt(a) > parseInt(b)){
                                         $(this).val(b);
                                 }
                                 else {}
                         });
-                        $('#doc_monto.{{a.0.id}}').on('change',function(){
+                        $('#doc_monto.{{a.first.id}}').on('change',function(){
                                 var a = $(this).val();
-                                $('#gasto.{{a.0.id}}').attr("max",a);
+                                $('#gasto.{{a.first.id}}').attr("max",a);
                         });
                     });
                 </script>
 
                <td><!--monto doc-->
-                 <input id="doc_monto" name="{{a.0.id}}" type="number" class="form-control {{a.0.id}}" value="{{a.0.doc_monto}}" min="0">
+                 <input id="doc_monto" name="{{a.first.id}}" type="number" class="form-control {{a.first.id}}" value="{{a.first.doc_monto}}" min="0">
                </td>
 
                <td><!--monto gasto-->
-                 <input id="gasto" name="{{a.0.id}}" type="number" class="form-control {{a.0.id}} gasto-seccion2" value="{{a.0.gasto}}" min="0">
+                 <input id="gasto" name="{{a.first.id}}" type="number" class="form-control {{a.first.id}} gasto-seccion2" value="{{a.first.gasto}}" min="0">
                </td>
 
                <td><!--cuenta presupuesto-->
                  <div class="controls">
-                   <select id="contabilidad_id" name="{{a.0.id}}" class="form-control contabilidad-{{a.0.id}}">
+                   <select id="contabilidad_id" name="{{a.first.id}}" class="form-control contabilidad-{{a.first.id}}">
                      {% for i in contabilidad %} 
-                        <option class="{{forloop.counter}}" value="{{i.id}}" {% if a.0.contabilidad_id == i.id %}selected{% endif %}>{{i.nombre}}</option>
+                        <option class="{{forloop.counter}}" value="{{i.id}}" {% if a.first.contabilidad_id == i.id %}selected{% endif %}>{{i.nombre}}</option>
                      {% endfor %}
                    </select>          
                  </div>
                 <script>
-                $('select#contabilidad_id.contabilidad-{{a.0.id}}').on('change', function(e){
+                $('select#contabilidad_id.contabilidad-{{a.first.id}}').on('change', function(e){
                         e.preventDefault();
                         var element = $(this).val();
                         var id = $(this).attr("name");
@@ -530,8 +527,8 @@
                             url: '/jscontahijo/',
                             data:  {contaid : element },
                             success: function(data){
-                                                select = $('#contabilidad_hijo_id.contabilidad_hijo-{{a.0.id}}');
-                                                $('#contabilidad_hijo_id.contabilidad_hijo-{{a.0.id}}').empty();
+                                                select = $('#contabilidad_hijo_id.contabilidad_hijo-{{a.first.id}}');
+                                                $('#contabilidad_hijo_id.contabilidad_hijo-{{a.first.id}}').empty();
                                                 for (var i in data){
                                                     var option = document.createElement('option');
                                                     option.innerHTML = data[i].nombre;
@@ -545,11 +542,8 @@
 
                </td>
                <td><!--sub cuenta presupuesto-->
-                   <select id="contabilidad_hijo_id" name="{{a.0.id}}" class="form-control contabilidad_hijo-{{a.0.id}}">
-                       <option value="{{a.0.contabilidad_hijo_id}}" {% if a.0.contabilidad_hijo_id %}selected{% endif %}>
-				{% for j in conta_hijo %}{% if j.id == a.0.contabilidad_hijo_id %} {{j.nombre|title}} {% endif %}
-				{%endfor%}
-			</option>
+                   <select id="contabilidad_hijo_id" name="{{a.first.id}}" class="form-control contabilidad_hijo-{{a.first.id}}">
+                       <option value="{{a.first.contabilidad_hijo_id}}" {% if a.first.contabilidad_hijo_id %}selected{% endif %}>{{a.first.contabilidad_hijo.nombre|title}}</option>
                    </select>
                </td>
             </tr>
@@ -664,34 +658,34 @@
           {% if not rgd_array %}<tr><td colspan="16" style="text-align: center;">No se encontraron registros</td></tr>{% endif %}
 
           {% for a in rgd_array %}
-            <tr class="{{a.0.id}}">
+            <tr class="{{a.first.id}}">
                <th>{{ forloop.counter }}</th>
                <td>
-                 <!--a href="{% url 'delgd' %}?rid={{rid.id}}&gd_id={{a.0.id}}"--><span data-id="{{a.0.id}}" class="glyphicon glyphicon-trash"></span></a>
+                 <!--a href="{% url 'delgd' %}?rid={{rid.id}}&gd_id={{a.first.id}}"--><span data-id="{{a.first.id}}" class="glyphicon glyphicon-trash"></span></a>
                </td>
                <td>
-                 <input id="detalle" name="g{{a.0.id}}" type="text" class="form-control" value=
-                   {% if a.0.detalle == None %}
+                 <input id="detalle" name="g{{a.first.id}}" type="text" class="form-control" value=
+                   {% if a.first.detalle == None %}
                    ""
                    {% else %}
-                     "{{a.0.detalle}}"
+                     "{{a.first.detalle}}"
                    {% endif %}
                  >
                </td>
                <td>
-                 <input id="deposito_no" name="g{{a.0.id}}" type="text" class="form-control" value=
-                   {% if a.0.deposito_no == None %}
+                 <input id="deposito_no" name="g{{a.first.id}}" type="text" class="form-control" value=
+                   {% if a.first.deposito_no == None %}
                    ""
                    {% else %}
-                     "{{a.0.deposito_no}}" 
+                     "{{a.first.deposito_no}}" 
                    {% endif %}
                  >
                </td>
-               <td><input id="fecharendicion" name="g{{a.0.id}}" type="date" placeholder="dd/mm/yyyy"
-                    value="{{a.0.fecha|date:"Y-m-d"}}"
+               <td><input id="fecharendicion" name="g{{a.first.id}}" type="date" placeholder="dd/mm/yyyy"
+                    value="{{a.first.fecha|date:"Y-m-d"}}"
                     class="form-control"></td>
                <td>
-                 <input id="monto" name="g{{a.0.id}}" type="number" class="form-control dev-seccion3" value="{{a.0.monto}}" min="0">
+                 <input id="monto" name="g{{a.first.id}}" type="number" class="form-control dev-seccion3" value="{{a.first.monto}}" min="0">
                </td>
             </tr>
           {% endfor %}
@@ -1025,31 +1019,31 @@
           {% if not rfd_array %}<tr><td colspan="16" style="text-align: center;">No se encontraron registros</td></tr>{% endif %}
 
           {% for a in rfd_array %}
-            <tr class="{{a.0.id}}">
+            <tr class="{{a.first.id}}">
                <th>{{ forloop.counter }}</th>
                <td>
-                 <!--a href="{% url 'delfd' %}?rid={{rid.id}}&fd_id={{a.0.id}}"-->
-		 <span data-id="{{a.0.id}}" class="glyphicon glyphicon-trash"></span><!--/a-->
+                 <!--a href="{% url 'delfd' %}?rid={{rid.id}}&fd_id={{a.first.id}}"-->
+		 <span data-id="{{a.first.id}}" class="glyphicon glyphicon-trash"></span><!--/a-->
                </td>
 
 	       <td><!--cuenta supereduc: categoria-->
                   <div class="controls">
-                    <select id="categoria_id" name="{{a.0.id}}" class="form-control categoria-{{a.0.id}}">
+                    <select id="categoria_id" name="{{a.first.id}}" class="form-control categoria-{{a.first.id}}">
                      {% for i in categoria %} 
-                        <option class="{{forloop.counter}}" value="{{i.id}}" {% if a.0.categoria_id == i.id %}selected{% endif %}>{{i.nombre|title}}</option>
+                        <option class="{{forloop.counter}}" value="{{i.id}}" {% if a.first.categoria_id == i.id %}selected{% endif %}>{{i.nombre|title}}</option>
                      {% endfor %}
                     </select>          
                   </div>
                   <script>
-                  $('select#categoria_id.categoria-{{a.0.id}}').on('change', function(e){
+                  $('select#categoria_id.categoria-{{a.first.id}}').on('change', function(e){
                         e.preventDefault();
                         var element = $(this).val();
                         var id = $(this).attr("name");
                         $.ajax({    
                             type: 'GET', url: '/jssubcat/', data:  {catid : element },
                             success: function(data){
-                                                select = $('#subcategoria_id.subcategoria-{{a.0.id}}');
-                                                $('#subcategoria_id.subcategoria-{{a.0.id}}').empty();
+                                                select = $('#subcategoria_id.subcategoria-{{a.first.id}}');
+                                                $('#subcategoria_id.subcategoria-{{a.first.id}}').empty();
                                                 for (var i in data){
                                                     console.log(data[i].id + " - " + data[i].nombre);
                                                     var option = document.createElement('option');
@@ -1063,26 +1057,23 @@
                   </script>
                </td>
                <td><!--sub cuenta supereduc: subcategoria-->
-                   <select id="subcategoria_id" name="{{a.0.id}}" class="form-control subcategoria-{{a.0.id}}">
-                       <option value="{{a.0.subcategoria_id}}" {% if a.0.subcategoria_id %}selected{% endif %}>
-				{% for subcat in subcategoria %}{% if subcat.id == a.0.subcategoria_id %} {{subcat.nombre|title}} {% endif %}
-				{%endfor%}
-			</option>
+                   <select id="subcategoria_id" name="{{a.first.id}}" class="form-control subcategoria-{{a.first.id}}">
+                       <option value="{{a.first.subcategoria_id}}" {% if a.first.subcategoria_id %}selected{% endif %}>{{a.first.subcategoria.nombre|title}}</option>
                    </select>
                </td>
 
 
 
                <td><!--tipo de pago--><!--cheque-->
-                 <!--input id="cheque" name="{{a.0.id}}" type="text" class="form-control" value=
-		   "{% if a.0.cheque == '1' %}Cheque{% elif a.0.cheque == '0' %}Efectivo{% else %}-{% endif %}"
+                 <!--input id="cheque" name="{{a.first.id}}" type="text" class="form-control" value=
+		   "{% if a.first.cheque == '1' %}Cheque{% elif a.first.cheque == '0' %}Efectivo{% else %}-{% endif %}"
 		 -->
                  <div class="controls">
-                   <select id="cheque" name="{{a.0.id}}" class="form-control cheque-{{a.0.id}}">
+                   <select id="cheque" name="{{a.first.id}}" class="form-control cheque-{{a.first.id}}">
                      {% for i in cheque %}
-                        <option value="{{i.0}}" {% if a.0.cheque == i.0 %}selected{% endif %}>{{i.1}}</option>
+                        <option value="{{i.0}}" {% if a.first.cheque == i.0 %}selected{% endif %}>{{i.1}}</option>
                      {% endfor %}
-	    	     {% if a.0.cheque is None  %}
+	    	     {% if a.first.cheque is None  %}
 		          <option value="2" selected></option>
                           <!--option selected></option-->
 		     {% endif %}
@@ -1090,33 +1081,33 @@
                  </div> 
                </td>
 		<script>
-			$('.cheque-{{a.0.id}}').on('change', function(){
+			$('.cheque-{{a.first.id}}').on('change', function(){
 			if ($(this).val() != 1){
-			    $('.doc_no_cheque-{{a.0.id}}').attr("readonly",true);
-                            $('.doc_no_cheque-{{a.0.id}}').val("");
+			    $('.doc_no_cheque-{{a.first.id}}').attr("readonly",true);
+                            $('.doc_no_cheque-{{a.first.id}}').val("");
 			  }
 			else {
-			    $('.doc_no_cheque-{{a.0.id}}').attr("readonly",false);
+			    $('.doc_no_cheque-{{a.first.id}}').attr("readonly",false);
 			  }
 			});
 		</script>
                <td><!--no cheque--><!--doc_no_cheque-->
-                 <input id="doc_no_cheque" name="{{a.0.id}}" type="text" class="form-control doc_no_cheque-{{a.0.id}}" value=
-		   {% if a.0.cheque == '2' or a.0.cheque == '0' %}
+                 <input id="doc_no_cheque" name="{{a.first.id}}" type="text" class="form-control doc_no_cheque-{{a.first.id}}" value=
+		   {% if a.first.cheque == '2' or a.first.cheque == '0' %}
                      "" readonly
                    {% else %}
-                     "{{a.0.doc_no_cheque}}"
+                     "{{a.first.doc_no_cheque}}"
                    {% endif %}
 		 > 
 
                </td>
                <td><!--tipo de doc--><!--doc_tipo_id-->
-                 <!--input id="doc_tipo_id" name="{{a.0.id}}" type="text" class="form-control" value="{{a.0.doc_tipo.nombre|title}}"-->
+                 <!--input id="doc_tipo_id" name="{{a.first.id}}" type="text" class="form-control" value="{{a.first.doc_tipo.nombre|title}}"-->
 
                  <div class="controls">               
-                   <select id="doc_tipo_id" name="{{a.0.id}}" class="form-control">
+                   <select id="doc_tipo_id" name="{{a.first.id}}" class="form-control">
                      {% for i in doctipo %} 
-                        <option value="{{i.id}}" {%if a.0.doc_tipo_id == i.id%}selected{%endif%}>{{i.nombre|title}}</option>
+                        <option value="{{i.id}}" {%if a.first.doc_tipo_id == i.id%}selected{%endif%}>{{i.nombre|title}}</option>
                      {% endfor %}
                    </select>          
                  </div>
@@ -1125,8 +1116,8 @@
 
                </td>
                <td><!--no. de doc - cod BBDD desde doc tipo id--><!--doc_no-->
-                 <input id="doc_no" name="{{a.0.id}}" type="text" class="form-control" value=
-		   {% if a.0.doc_no == None %}""{% else %}"{{a.0.doc_no}}"{% endif %}
+                 <input id="doc_no" name="{{a.first.id}}" type="text" class="form-control" value=
+		   {% if a.first.doc_no == None %}""{% else %}"{{a.first.doc_no}}"{% endif %}
 		 >
                </td>
 
@@ -1152,50 +1143,50 @@
                </script>
 
                <td><!--fecha doc--><!--doc_fecha-->
-                 <input id="doc_fecha" name="{{a.0.id}}" type="date" class="form-control {{a.0.id}} new_date" value="{{a.0.doc_fecha|date:"Y-m-d"}}" 
+                 <input id="doc_fecha" name="{{a.first.id}}" type="date" class="form-control {{a.first.id}} new_date" value="{{a.first.doc_fecha|date:"Y-m-d"}}" 
                  min="{{min_fecha_doc}}" max="{{rid.fecha_subida|date:"Y-m-d"}}" />
                </td>
                <td><!--fecha de pago-->
-                 <input id="doc_fecha_pago" name="{{a.0.id}}" type="date" class="form-control {{a.0.id}} new_date_p" value="{{a.0.doc_fecha_pago|date:"Y-m-d"}}" 
-                 min="{{a.0.doc_fecha|date:"Y-m-d"}}" max="{{rid.fecha_subida|date:"Y-m-d"}}" />
+                 <input id="doc_fecha_pago" name="{{a.first.id}}" type="date" class="form-control {{a.first.id}} new_date_p" value="{{a.first.doc_fecha_pago|date:"Y-m-d"}}" 
+                 min="{{a.first.doc_fecha|date:"Y-m-d"}}" max="{{rid.fecha_subida|date:"Y-m-d"}}" />
                </td>
 	       <script>
-		$(document.body).on('change','#doc_fecha.{{a.0.id}}', function() {
-		    var fecha = $('#doc_fecha.{{a.0.id}}').val();
+		$(document.body).on('change','#doc_fecha.{{a.first.id}}', function() {
+		    var fecha = $('#doc_fecha.{{a.first.id}}').val();
 		    /*console.log(fecha);*/
-                    $('#doc_fecha_pago.{{a.0.id}}').val(fecha);
-                    $('#doc_fecha_pago.{{a.0.id}}').attr("min",fecha);
+                    $('#doc_fecha_pago.{{a.first.id}}').val(fecha);
+                    $('#doc_fecha_pago.{{a.first.id}}').attr("min",fecha);
                 });
 	       </script>
 
                <td><!--descripcion del gasto-->
-                 <input id="doc_detalle" name="{{a.0.id}}" type="text" class="form-control" value=
-                   {% if a.0.doc_detalle == None %}
+                 <input id="doc_detalle" name="{{a.first.id}}" type="text" class="form-control" value=
+                   {% if a.first.doc_detalle == None %}
                      ""
                    {% else %}
-                     "{{a.0.doc_detalle}}"
+                     "{{a.first.doc_detalle}}"
                    {% endif %}
                  >
                </td>
            <!--modal-->
-               <td style="text-align: center;"><a onclick="proveedormodal({{a.0.id}})" id="myBtn-{{a.0.id}}" ><span class="glyphicon glyphicon-edit"></span></a></td>
+               <td style="text-align: center;"><a onclick="proveedormodal({{a.first.id}})" id="myBtn-{{a.first.id}}" ><span class="glyphicon glyphicon-edit"></span></a></td>
            <!--endmodal-->
                <td><!--rut proveedor-->
-                 <input readonly id="proveedor_rut-{{a.0.id}}" name="{{a.0.id}}" type="text" class="form-control" style="width: 110px;"
+                 <input readonly id="proveedor_rut-{{a.first.id}}" name="{{a.first.id}}" type="text" class="form-control" style="width: 110px;"
                   pattern="^\d{7,8}-[0-9-,k]{1}$" value=
-                   {% if a.0.proveedor_rut == '-' %}
+                   {% if a.first.proveedor_rut == '-' %}
                      ""
                    {% else %}   
-                     "{{a.0.proveedor_rut}}">
+                     "{{a.first.proveedor_rut}}">
                    {% endif %}
                </td>
                <td><!--nombre proveedor-->
-                 <input readonly id="proveedor_nombre-{{a.0.id}}" name="{{a.0.id}}" type="text" class="form-control" style="width: 300px;"
+                 <input readonly id="proveedor_nombre-{{a.first.id}}" name="{{a.first.id}}" type="text" class="form-control" style="width: 300px;"
                  value=
-                   {% if a.0.proveedor_nombre == '-' %}
+                   {% if a.first.proveedor_nombre == '-' %}
                      ""
                    {% else %}   
-                     "{{a.0.proveedor_nombre}}"
+                     "{{a.first.proveedor_nombre}}"
                    {% endif %}
                 >
 
@@ -1205,23 +1196,23 @@
   /* The Modal (background) */
   .modalp {display: none; /* Hidden by default */position: fixed; /* Stay in place */z-index: 1; /* Sit on top */padding-top: 100px; /* Location of the box */  left: 0;top: 0;width: 100%; /* Full width */height: 100%; /* Full height */overflow: auto; /* Enable scroll if needed */  background-color: rgb(0,0,0); /* Fallback color */background-color: rgba(0,0,0,0.4); /* Black w/ opacity */  }   /* Modal Content */  
   .modalp-content {background-color: #fefefe;margin: auto;padding: 20px;border: 1px solid #888;width: 80%;}    /* The Close Button */  
-  .close-{{a.0.id}} {color: #aaaaaa;float: right;font-size: 28px;font-weight: bold;}  .close-{{a.0.id}}:hover,  .close-{{a.0.id}}:focus {color: #000;text-decoration: none;cursor: pointer;}  
+  .close-{{a.first.id}} {color: #aaaaaa;float: right;font-size: 28px;font-weight: bold;}  .close-{{a.first.id}}:hover,  .close-{{a.first.id}}:focus {color: #000;text-decoration: none;cursor: pointer;}  
   </style>
 <!-- Trigger/Open The Modal -->
-<!--button id="myBtn-{{a.0.id}}">Open Modal</button-->
+<!--button id="myBtn-{{a.first.id}}">Open Modal</button-->
 
 
 <!-- The Modal -->
-<div id="myModal-{{a.0.id}}" class="modalp"><!-- Modal content -->
+<div id="myModal-{{a.first.id}}" class="modalp"><!-- Modal content -->
   <div class="modalp-content">
-    <span class="close-{{a.0.id}}">&times;</span>
+    <span class="close-{{a.first.id}}">&times;</span>
 
-    <p><!--id registro: {{a.0.id}}--><h3>Seleccione un proveedor:</h3>
+    <p><!--id registro: {{a.first.id}}--><h3>Seleccione un proveedor:</h3>
                <!--div class="controls"-->
-                  <select data-placeholder="Seleccione proveedor..." class="chosen-select" tabindex="2" onchange="chosen_fill_p({{a.0.id}},value)" >
+                  <select data-placeholder="Seleccione proveedor..." class="chosen-select" tabindex="2" onchange="chosen_fill_p({{a.first.id}},value)" >
                     {% for i in proveedores %} 
                        <option class="{{forloop.counter}}" value="{{i.id}}|{{i.rut}}|{{i.nombre}}"
-                       {% if a.0.proveedor_id == i.id %}selected{% endif %}
+                       {% if a.first.proveedor_id == i.id %}selected{% endif %}
                        >{{i.nombre}} - {{i.rut}}</option>
                     {% endfor %}
                   </select>          
@@ -1260,15 +1251,15 @@
  <!--end modal -->               
                
                <!--td><!-monto gasto->
-                 <input id="gasto" name="{{a.0.id}}" type="number" class="form-control {{a.0.id}} gasto-seccion2" value="{{a.0.gasto}}" min="0">
-<!- onKeyUp="checkvalmonto{{a.0.id}}()"->
+                 <input id="gasto" name="{{a.first.id}}" type="number" class="form-control {{a.first.id}} gasto-seccion2" value="{{a.first.gasto}}" min="0">
+<!- onKeyUp="checkvalmonto{{a.first.id}}()"->
                </td-->
 		<script>
 $(document).ready(function(e)
 {
-			$('#gasto.{{a.0.id}}').keypress(function(event){
+			$('#gasto.{{a.first.id}}').keypress(function(event){
 				var a = $(this).val();
-				var b = $('#doc_monto.{{a.0.id}}').val();
+				var b = $('#doc_monto.{{a.first.id}}').val();
 				if (parseInt(a) > parseInt(b)){
 					event.preventDefault();
 					$(this).val(b);
@@ -1276,43 +1267,43 @@ $(document).ready(function(e)
 				}
 				else {}
 			});
-                        $('#gasto.{{a.0.id}}').focusout(function(){
+                        $('#gasto.{{a.first.id}}').focusout(function(){
                                 var a = $(this).val();
-                                var b = $('#doc_monto.{{a.0.id}}').val(); 
+                                var b = $('#doc_monto.{{a.first.id}}').val(); 
 				if (parseInt(a) > parseInt(b)){
 					$(this).val(b);
 				}
                                 else {}
                         });
-                        $('#doc_monto.{{a.0.id}}').on('change',function(){
+                        $('#doc_monto.{{a.first.id}}').on('change',function(){
                                 var a = $(this).val();
-                                $('#gasto.{{a.0.id}}').attr("max",a);
+                                $('#gasto.{{a.first.id}}').attr("max",a);
                         });
 });
 		</script>
 
                <td><!--monto doc-->
-                 <input id="doc_monto" name="{{a.0.id}}" type="number" class="form-control {{a.0.id}}" value="{{a.0.doc_monto}}" min="0">
+                 <input id="doc_monto" name="{{a.first.id}}" type="number" class="form-control {{a.first.id}}" value="{{a.first.doc_monto}}" min="0">
                </td>
 
                <td><!--monto gasto-->
-                 <input id="gasto" name="{{a.0.id}}" type="number" class="form-control {{a.0.id}} gasto-seccion2" value="{{a.0.gasto}}" min="0">
-		 <!-- onKeyUp="checkvalmonto{{a.0.id}}()"-->
+                 <input id="gasto" name="{{a.first.id}}" type="number" class="form-control {{a.first.id}} gasto-seccion2" value="{{a.first.gasto}}" min="0">
+		 <!-- onKeyUp="checkvalmonto{{a.first.id}}()"-->
                </td>
 
                <td><!--cuenta presupuesto-->
-                 <!--input id="contabilidad_id" name="{{a.0.id}}" type="text" class="form-control" value="{{a.0.contabilidad.nombre|title}}"-->
+                 <!--input id="contabilidad_id" name="{{a.first.id}}" type="text" class="form-control" value="{{a.first.contabilidad.nombre|title}}"-->
 
                  <div class="controls">
-                   <select id="contabilidad_id" name="{{a.0.id}}" class="form-control contabilidad-{{a.0.id}}">
+                   <select id="contabilidad_id" name="{{a.first.id}}" class="form-control contabilidad-{{a.first.id}}">
                      {% for i in contabilidad %} 
-                        <option class="{{forloop.counter}}" value="{{i.id}}" {% if a.0.contabilidad_id == i.id %}selected{% endif %}>{{i.nombre}}</option>
+                        <option class="{{forloop.counter}}" value="{{i.id}}" {% if a.first.contabilidad_id == i.id %}selected{% endif %}>{{i.nombre}}</option>
                      {% endfor %}
                    </select>          
                  </div>
 		<script>
-		$('select#contabilidad_id.contabilidad-{{a.0.id}}').on('change', function(e){
-                /*$('select#contabilidad_id.contabilidad-{{a.0.id}}').click(function(e){*/
+		$('select#contabilidad_id.contabilidad-{{a.first.id}}').on('change', function(e){
+                /*$('select#contabilidad_id.contabilidad-{{a.first.id}}').click(function(e){*/
 		        e.preventDefault();
 		        var element = $(this).val();
 		        var id = $(this).attr("name");
@@ -1322,8 +1313,8 @@ $(document).ready(function(e)
 		            url: '/jscontahijo/',
 		            data:  {contaid : element },
 		            success: function(data){
-						select = $('#contabilidad_hijo_id.contabilidad_hijo-{{a.0.id}}');
-						$('#contabilidad_hijo_id.contabilidad_hijo-{{a.0.id}}').empty();
+						select = $('#contabilidad_hijo_id.contabilidad_hijo-{{a.first.id}}');
+						$('#contabilidad_hijo_id.contabilidad_hijo-{{a.first.id}}').empty();
 						for (var i in data){
 						/*    console.log(data[i].id + " - " + data[i].nombre);*/
 						    var option = document.createElement('option');
@@ -1338,11 +1329,8 @@ $(document).ready(function(e)
 
                </td>
                <td><!--sub cuenta presupuesto-->
-                   <select id="contabilidad_hijo_id" name="{{a.0.id}}" class="form-control contabilidad_hijo-{{a.0.id}}">
-	          	       <option value="{{a.0.contabilidad_hijo_id}}" {% if a.0.contabilidad_hijo_id %}selected{% endif %}>
-				{% for j in conta_hijo %}{% if j.id == a.0.contabilidad_hijo_id %} {{j.nombre|title}} {% endif %}
-				{%endfor%}
-				</option>
+                   <select id="contabilidad_hijo_id" name="{{a.first.id}}" class="form-control contabilidad_hijo-{{a.first.id}}">
+	          	       <option value="{{a.first.contabilidad_hijo_id}}" {% if a.first.contabilidad_hijo_id %}selected{% endif %}>{{a.first.contabilidad_hijo.nombre|title}}</option>
                    </select>
                </td>
             </tr>
@@ -1466,34 +1454,34 @@ $(document).ready(function(e)
           {% if not rgd_array %}<tr><td colspan="16" style="text-align: center;">No se encontraron registros</td></tr>{% endif %}
 
           {% for a in rgd_array %}
-            <tr class="{{a.0.id}}">
+            <tr class="{{a.first.id}}">
                <th>{{ forloop.counter }}</th>
                <td>
-                 <!--a href="{% url 'delgd' %}?rid={{rid.id}}&gd_id={{a.0.id}}"--><span data-id="{{a.0.id}}" class="glyphicon glyphicon-trash"></span></a>
+                 <!--a href="{% url 'delgd' %}?rid={{rid.id}}&gd_id={{a.first.id}}"--><span data-id="{{a.first.id}}" class="glyphicon glyphicon-trash"></span></a>
                </td>
                <td>
-		 <input id="detalle" name="g{{a.0.id}}" type="text" class="form-control" value=
-                   {% if a.0.detalle == None %}
+		 <input id="detalle" name="g{{a.first.id}}" type="text" class="form-control" value=
+                   {% if a.first.detalle == None %}
                    ""
                    {% else %}
-                     "{{a.0.detalle}}"
+                     "{{a.first.detalle}}"
                    {% endif %}
                  >
 	       </td>
                <td>
-	         <input id="deposito_no" name="g{{a.0.id}}" type="text" class="form-control" value=
-                   {% if a.0.deposito_no == None %}
+	         <input id="deposito_no" name="g{{a.first.id}}" type="text" class="form-control" value=
+                   {% if a.first.deposito_no == None %}
                    ""
                    {% else %}
-                     "{{a.0.deposito_no}}" 
+                     "{{a.first.deposito_no}}" 
                    {% endif %}
                  >
 	       </td>
-               <td><input id="fecharendicion" name="g{{a.0.id}}" type="date" placeholder="dd/mm/yyyy"
-                    value="{{a.0.fecha|date:"Y-m-d"}}"
+               <td><input id="fecharendicion" name="g{{a.first.id}}" type="date" placeholder="dd/mm/yyyy"
+                    value="{{a.first.fecha|date:"Y-m-d"}}"
                     class="form-control"></td>
                <td>
-		 <input id="monto" name="g{{a.0.id}}" type="number" class="form-control dev-seccion3" value="{{a.0.monto}}" min="0">
+		 <input id="monto" name="g{{a.first.id}}" type="number" class="form-control dev-seccion3" value="{{a.first.monto}}" min="0">
 	       </td>
 	    </tr>
 	  {% endfor %}

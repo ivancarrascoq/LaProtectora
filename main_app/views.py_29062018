@@ -109,18 +109,15 @@ def edit(request, rid):
     rfd = RendicionesFondosDetalles.objects.filter(rendicion_id = rid)
     rfd_count = rfd.count()
     rfd_array = list()#range(rfd_count))
-    subcat_tuples = ()
-    conhijo_tuples = ()
     for j in rfd:##        print 'RFD '+str(j.id)+' fondo_id: '+str(j.fondos_detalles_id)+', rendicion id: '+str(j.rendicion_id)
-      #rfd_array.append(FondoDetalle.objects.select_related('doc_tipo','proveedor','contabilidad', 'contabilidad_hijo','categoria','subcategoria').filter(id = int(j.fondos_detalles_id)))
-      rfd_array.append(
-        list(FondoDetalle.objects.select_related('doc_tipo','proveedor','contabilidad', 'contabilidad_hijo','categoria','subcategoria').filter(id = int(j.fondos_detalles_id)).values()  )
-      )
+      rfd_array.append(FondoDetalle.objects.select_related('doc_tipo','proveedor','contabilidad', 'contabilidad_hijo','categoria','subcategoria').filter(id = int(j.fondos_detalles_id)))
+      #rfd_array.append(
+      #  list(FondoDetalle.objects.select_related('doc_tipo','proveedor','contabilidad', 'contabilidad_hijo','categoria','subcategoria').filter(id = int(j.fondos_detalles_id)).values()  )
+      #)
       #     print 'test',FondoDetalle.objects.select_related('doc_tipo','proveedor','contabilidad', 'contabilidad_hijo','categoria','subcategoria').filter(j.fondos_detalles_id)
       #        rfd_array.append(FondoDetalle.objects.select_related('doc_tipo').select_related('proveedor').#        select_related('contabilidad').select_related('contabilidad_hijo').#        select_related('categoria').select_related('subcategoria').#        filter(id = int(j.fondos_detalles_id)))##    print rfd_array##    print "for in array"#    for a in rfd_array:#        print a[0]    #gasto: devolucion
-      subcat_tuples = subcat_tuples + (rfd_array[-1][0]['subcategoria_id'],)
-      conhijo_tuples = conhijo_tuples + (rfd_array[-1][0]['contabilidad_hijo_id'],)
-    #print rfd_array
+
+    print rfd_array
     #print 'lista: ', type(rfd_array) #to delete
     #restricciones para cerrar rendicion
     close_rid = 0
@@ -239,14 +236,11 @@ def edit(request, rid):
       mes = mes[int(date_low_month)-3:int(date_low_month)+2]
     #mes = mes[int(date_low_month)-1:]
     min_fecha_doc = (rid.fecha_subida - two_month).strftime("%Y-%m-%d")
-    #print subcat_tuples
-    subcat_tuples2 = list(Subcategoria.objects.filter(id__in = subcat_tuples))
-    conhijo_tuples2 = list(ContabilidadHijo.objects.filter(id__in = conhijo_tuples)) 
-    print conhijo_tuples2
+
     return render(request, 'edit.html', {'centrocosto': centrocosto, 'mes': mes, 'tipofondo': tipofondo, 
     'subvencion': subvencion, 'rid': rid, 'rall':rall, 'rfd_array': rfd_array, 'rgd_array': rgd_array,
     'cheque': cheque, 'doctipo': doctipo, 'contabilidad': contabilidad, 'categoria': categoria,
-    'xrendir': xrendir, 'close_rid': close_rid, 'proveedores': proveedores, 'min': date_low_limit, 'min_fecha_doc': min_fecha_doc, 'subcategoria': subcat_tuples2, 'conta_hijo': conhijo_tuples2 })
+    'xrendir': xrendir, 'close_rid': close_rid, 'proveedores': proveedores, 'min': date_low_limit, 'min_fecha_doc': min_fecha_doc })
 
 def addfd(request):
     print 'Add FD:'
@@ -480,9 +474,7 @@ def jscontahijo(request):
 
 def jssubcat(request):
     catid = request.GET['catid']
-    #print catid
     subcat = list(Subcategoria.objects.filter(categoria_id = catid).values('nombre', 'id'))
-    #print subcat
     return HttpResponse(json.dumps(subcat),content_type="application/json")
 
 def post_upload(request):
