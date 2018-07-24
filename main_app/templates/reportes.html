@@ -67,10 +67,30 @@
           #print-button{display:none;}
           .break {page-break-after: always;}
           .print-hidden {display:block;}
+	  .print-hidden-signature {display:block !important;}
           .btn {display:none;}
         }
         .nobr { white-space: nowrap; text-align:right; }
         .print-hidden {display:none;}
+	.print-hidden-signature {display:none;}
+	#signaturediv {
+	  width: 300px;
+	  margin: 100px auto 0 auto;
+	  position: absolute;
+	  bottom: 40px;
+	  right: 16px;
+	  font-size: 18px;
+	}
+	#signaturename {
+	  text-align: center;
+	  font-weight: bold;
+	  font-size: 110%;
+	}
+	#signature {
+	  width: 100%;
+	  border-bottom: 1px solid black;
+	  height: 30px;
+	}
         </style>
         <script>
 
@@ -116,6 +136,10 @@
                 </tbody>
           </table>
 
+<div class="print-hidden-siganture" id="signaturediv"/>
+  <div id="signaturename">  Firma Responsable:</div>
+  <div id="signature"></div>
+</div>
           <hr/>
           <div class="break"></div><br class="print-hidden"/>
           <h4>Detalle Efectivo</h4>
@@ -304,10 +328,32 @@
 	  #print-button{display:none;}
 	  .break {page-break-after: always;}
 	  .print-hidden {display:block;}
+	  .print-hidden-signature {display:block !important;}
           .btn {display:none;}
 	}
         .nobr { white-space: nowrap; text-align:right; }
 	.print-hidden {display:none;}
+	.print-hidden-signature {display:none;}
+	#signaturediv {
+	  width: 300px;
+	  margin: 100px auto 0 auto;
+	  position: absolute;
+	  bottom: 40px;
+	  right: 16px;
+	  font-size: 18px;
+	}
+	#signaturename {
+	  text-align: center;
+	  font-weight: bold;
+	  font-size: 110%;
+	}
+	#signature {
+	  width: 100%;
+	  border-bottom: 1px solid black;
+	  height: 30px;
+	}
+
+
 	</style>
 	<script>
 	/*function myFunction() {
@@ -358,6 +404,15 @@
 			</tr>
                 </tbody>
           </table>
+
+
+
+
+
+<div class="print-hidden-signature" id="signaturediv"/>
+  <div id="signaturename">  Firma Responsable:</div>
+  <div id="signature"></div>
+</div>
 
           <hr/>
 	  <div class="break"></div><br class="print-hidden"/>
