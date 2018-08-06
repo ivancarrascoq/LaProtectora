@@ -5,3 +5,4 @@ LaProtectora/*.pyc
 main_app/*.pyc
 main_app/migrations/*.pyc
 *.log
+connection.txt
