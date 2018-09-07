@@ -801,7 +801,7 @@ def post_filter(request):
         writer.writerow([CentroCosto.objects.get(id = j.rendicion.centro_costo_id).rbd, Subvencion.objects.get(id=j.rendicion.subvencion_id).nombre,
                 Subcategoria.objects.get(id=j.fondos_detalles.subcategoria_id).code, DocTipo.objects.get(id = j.fondos_detalles.doc_tipo_id).sigla ,
                 j.fondos_detalles.doc_no , j.fondos_detalles.doc_fecha.strftime("%d-%m-%Y") ,j.fondos_detalles.doc_fecha_pago.strftime("%d-%m-%Y") ,
-                j.fondos_detalles.doc_detalle ,j.fondos_detalles.proveedor_rut ,j.fondos_detalles.proveedor_nombre ,
+                j.fondos_detalles.doc_detalle.capitalize() ,j.fondos_detalles.proveedor_rut ,j.fondos_detalles.proveedor_nombre ,
                 j.fondos_detalles.gasto ,j.fondos_detalles.doc_monto ,Contabilidad.objects.get(id=j.fondos_detalles.contabilidad_id).nombre ,
                 ContabilidadHijo.objects.get(id=j.fondos_detalles.contabilidad_hijo_id).nombre ,che_efe])
       return response
@@ -829,7 +829,7 @@ def post_filter(request):
       #Subvencion.objects.get(id=j.rendicion.subvencion_id).nombre, Subcategoria.objects.get(id=j.fondos_detalles.subcategoria_id).code, 
       #DocTipo.objects.get(id = j.fondos_detalles.doc_tipo_id).sigla ,j.fondos_detalles.doc_no , 
       #j.fondos_detalles.doc_fecha.strftime("%d-%m-%Y") ,j.fondos_detalles.doc_fecha_pago.strftime("%d-%m-%Y") ,
-      #j.fondos_detalles.doc_detalle ,j.fondos_detalles.proveedor_rut ,j.fondos_detalles.proveedor_nombre , j.fondos_detalles.gasto,
+      #j.fondos_detalles.doc_detalle.capitalize() ,j.fondos_detalles.proveedor_rut ,j.fondos_detalles.proveedor_nombre , j.fondos_detalles.gasto,
       #j.fondos_detalles.doc_monto ,Contabilidad.objects.get(id=j.fondos_detalles.contabilidad_id).nombre ,
       #ContabilidadHijo.objects.get(id=j.fondos_detalles.contabilidad_hijo_id).nombre ,che_efe]
       for j in query_filter:
@@ -841,7 +841,7 @@ def post_filter(request):
         rend_no1 = RendicionesFondosDetalles.objects.get(id = j.fondos_detalles.id).rendicion_id
         #print rend_no1
         rend_no = '-'
-        row = [CentroCosto.objects.get(id = j.rendicion.centro_costo_id).rbd, Subvencion.objects.get(id=j.rendicion.subvencion_id).nombre, Subcategoria.objects.get(id=j.fondos_detalles.subcategoria_id).code, DocTipo.objects.get(id = j.fondos_detalles.doc_tipo_id).sigla ,j.fondos_detalles.doc_no , j.fondos_detalles.doc_fecha.strftime("%d-%m-%Y") ,j.fondos_detalles.doc_fecha_pago.strftime("%d-%m-%Y") ,j.fondos_detalles.doc_detalle ,j.fondos_detalles.proveedor_rut ,j.fondos_detalles.proveedor_nombre , j.fondos_detalles.gasto,j.fondos_detalles.doc_monto ,Contabilidad.objects.get(id=j.fondos_detalles.contabilidad_id).nombre ,ContabilidadHijo.objects.get(id=j.fondos_detalles.contabilidad_hijo_id).nombre ,che_efe, rend_no1]
+        row = [CentroCosto.objects.get(id = j.rendicion.centro_costo_id).rbd, Subvencion.objects.get(id=j.rendicion.subvencion_id).nombre, Subcategoria.objects.get(id=j.fondos_detalles.subcategoria_id).code, DocTipo.objects.get(id = j.fondos_detalles.doc_tipo_id).sigla ,j.fondos_detalles.doc_no , j.fondos_detalles.doc_fecha.strftime("%d-%m-%Y") ,j.fondos_detalles.doc_fecha_pago.strftime("%d-%m-%Y") ,j.fondos_detalles.doc_detalle.capitalize() ,j.fondos_detalles.proveedor_rut ,j.fondos_detalles.proveedor_nombre , j.fondos_detalles.gasto,j.fondos_detalles.doc_monto ,Contabilidad.objects.get(id=j.fondos_detalles.contabilidad_id).nombre ,ContabilidadHijo.objects.get(id=j.fondos_detalles.contabilidad_hijo_id).nombre ,che_efe, rend_no1]
         for col_num in range(len(row)):
             #print row_num, col_num, row[col_num]
             ws.write(row_num, col_num, row[col_num], font_style)
@@ -890,7 +890,7 @@ def post_filter2(request):
         writer.writerow([CentroCosto.objects.get(id = j.rendicion.centro_costo_id).rbd, Subvencion.objects.get(id=j.rendicion.subvencion_id).nombre,
                 Subcategoria.objects.get(id=j.fondos_detalles.subcategoria_id).code, DocTipo.objects.get(id = j.fondos_detalles.doc_tipo_id).sigla ,
                 j.fondos_detalles.doc_no , j.fondos_detalles.doc_fecha.strftime("%d-%m-%Y") ,j.fondos_detalles.doc_fecha_pago.strftime("%d-%m-%Y") ,
-                j.fondos_detalles.doc_detalle ,j.fondos_detalles.proveedor_rut ,j.fondos_detalles.proveedor_nombre ,
+                j.fondos_detalles.doc_detalle.capitalize() ,j.fondos_detalles.proveedor_rut ,j.fondos_detalles.proveedor_nombre ,
                 j.fondos_detalles.gasto ,j.fondos_detalles.doc_monto ,Contabilidad.objects.get(id=j.fondos_detalles.contabilidad_id).nombre ,
                 ContabilidadHijo.objects.get(id=j.fondos_detalles.contabilidad_hijo_id).nombre ,che_efe])
       return response
@@ -903,11 +903,14 @@ def post_filter2(request):
       row_num = 0
       font_style = xlwt.XFStyle()
       font_style.font.bold = True
+
       columns = ['RBD','Subvencion','Codigo Sub-Cuenta','Codigo Documento','No. documento','fecha documento','fecha de pago',
         'Descripcion del gasto','Rut Proveedor','Nombre Proveedor','Monto Gasto','Monto Documento','Cuenta Presupuesto',
         'Sub Cuenta Presupuesto','Efectivo/Cheque','# Rendicion']
+
       for col_num in range(len(columns)):
         ws.write(row_num, col_num, columns[col_num], font_style)
+
       font_style = xlwt.XFStyle()
       for j in query_filter:
         row_num += 1
@@ -917,7 +920,7 @@ def post_filter2(request):
           che_efe = 'Efectivo'
         rend_no1 = RendicionesFondosDetalles.objects.get(id = j.fondos_detalles.id).rendicion_id
         rend_no = '-'
-        row = [CentroCosto.objects.get(id = j.rendicion.centro_costo_id).rbd, Subvencion.objects.get(id=j.rendicion.subvencion_id).nombre, Subcategoria.objects.get(id=j.fondos_detalles.subcategoria_id).code, DocTipo.objects.get(id = j.fondos_detalles.doc_tipo_id).sigla ,j.fondos_detalles.doc_no , j.fondos_detalles.doc_fecha.strftime("%d-%m-%Y") ,j.fondos_detalles.doc_fecha_pago.strftime("%d-%m-%Y") ,j.fondos_detalles.doc_detalle ,j.fondos_detalles.proveedor_rut ,j.fondos_detalles.proveedor_nombre , j.fondos_detalles.gasto,j.fondos_detalles.doc_monto ,Contabilidad.objects.get(id=j.fondos_detalles.contabilidad_id).nombre ,ContabilidadHijo.objects.get(id=j.fondos_detalles.contabilidad_hijo_id).nombre ,che_efe,
+        row = [CentroCosto.objects.get(id = j.rendicion.centro_costo_id).rbd, Subvencion.objects.get(id=j.rendicion.subvencion_id).nombre, Subcategoria.objects.get(id=j.fondos_detalles.subcategoria_id).code, DocTipo.objects.get(id = j.fondos_detalles.doc_tipo_id).sigla ,j.fondos_detalles.doc_no , j.fondos_detalles.doc_fecha.strftime("%d-%m-%Y") ,j.fondos_detalles.doc_fecha_pago.strftime("%d-%m-%Y") ,j.fondos_detalles.doc_detalle.capitalize() ,j.fondos_detalles.proveedor_rut ,j.fondos_detalles.proveedor_nombre , j.fondos_detalles.gasto,j.fondos_detalles.doc_monto ,Contabilidad.objects.get(id=j.fondos_detalles.contabilidad_id).nombre ,ContabilidadHijo.objects.get(id=j.fondos_detalles.contabilidad_hijo_id).nombre ,che_efe,
 rend_no1]
         for col_num in range(len(row)):
             ws.write(row_num, col_num, row[col_num], font_style)
