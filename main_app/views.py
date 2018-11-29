@@ -228,9 +228,10 @@ def edit(request, rid):
     #fechas limites inferiores
     one_month = datetime.timedelta(30)
     two_month = datetime.timedelta(60)
+    three_month = datetime.timedelta(90)
     now = datetime.date.today()
-    date_low_limit = (now - one_month).strftime("%Y-%m-%d")
-    date_low_month = (now - one_month).strftime("%m")
+    date_low_limit = (now - three_month).strftime("%Y-%m-%d")
+    date_low_month = (now - three_month).strftime("%m")
     if now.month == 12:
       mes = mes['noviembre','diciembre','enero']
     elif now.month == 1:
@@ -238,7 +239,7 @@ def edit(request, rid):
     else:
       mes = mes[int(date_low_month)-3:int(date_low_month)+2]
     #mes = mes[int(date_low_month)-1:]
-    min_fecha_doc = (rid.fecha_subida - two_month).strftime("%Y-%m-%d")
+    min_fecha_doc = (rid.fecha_subida - three_month).strftime("%Y-%m-%d")
     #print subcat_tuples
     subcat_tuples2 = list(Subcategoria.objects.filter(id__in = subcat_tuples))
     conhijo_tuples2 = list(ContabilidadHijo.objects.filter(id__in = conhijo_tuples)) 
