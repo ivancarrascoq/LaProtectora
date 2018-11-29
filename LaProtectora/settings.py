@@ -154,3 +154,10 @@ STATIC_URL = '/static/'
 #
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+#
+
+
+
+#ivanx - allows more post/get, default is 1000
+#https://docs.djangoproject.com/en/1.11/ref/settings/
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
