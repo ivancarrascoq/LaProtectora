@@ -234,6 +234,8 @@ def edit(request, rid):
     date_low_month = (now - three_month).strftime("%m")
     if now.month == 12:
       mes = mes['noviembre','diciembre','enero']
+    elif now.month == 11:
+      mes = ['septiembre','octubre','noviembre','diciembre']
     elif now.month == 1:
       mes = ['diciembre','enero','febrero']
     else:
@@ -341,7 +343,8 @@ def new(request):
     elif now.month == 1:
       mes = ['diciembre','enero','febrero']
     else:
-      mes = mes[int(date_low_month)-3:int(date_low_month)+2]
+#      mes = mes[int(date_low_month)-3:int(date_low_month)+2]
+      mes = mes[int(now.month)-3:int(now.month)+2]
 
     return render(request, 'new.html', {'centrocosto': centrocosto, 'mes': mes, 'tipofondo': tipofondo, 'subvencion': subvencion, 'min': date_low_limit })
 
