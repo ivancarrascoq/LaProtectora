@@ -233,7 +233,7 @@ def edit(request, rid):
     date_low_limit = (now - three_month).strftime("%Y-%m-%d")
     date_low_month = (now - three_month).strftime("%m")
     if now.month == 12:
-      mes = mes['noviembre','diciembre','enero']
+      mes = ['noviembre','diciembre','enero']
     elif now.month == 11:
       mes = ['septiembre','octubre','noviembre','diciembre']
     elif now.month == 1:
@@ -339,7 +339,7 @@ def new(request):
     date_low_limit = (now - one_month).strftime("%Y-%m-%d")
     date_low_month = (now - one_month).strftime("%m")
     if now.month == 12:
-      mes = mes['noviembre','diciembre','enero']
+      mes = ['noviembre','diciembre','enero']
     elif now.month == 1:
       mes = ['diciembre','enero','febrero']
     else:
