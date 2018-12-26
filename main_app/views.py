@@ -41,7 +41,7 @@ def index(request):
       filtro_users = User.objects.all().filter(username__contains = filtro)
       rendicion = Rendicion.objects.filter(user_id__in = filtro_users).order_by('-id').filter(locked = 0)[:100]
       #rendicion = Rendicion.objects.all().order_by('user_id').filter(locked = 0)[:100]
-      rendicion_c = Rendicion.objects.filter(user_id__in = filtro_users).order_by('-id').filter(locked = 1)[:100]
+      rendicion_c = Rendicion.objects.filter(user_id__in = filtro_users).order_by('-id').filter(locked = 1)[:300]
       #rendicion_c = Rendicion.objects.all().order_by('user_id').filter(locked = 1)[:100]
       subvencion = Subvencion.objects.all()
       #if user.id == 1:
