@@ -232,15 +232,18 @@ def edit(request, rid):
     now = datetime.date.today()
     date_low_limit = (now - three_month).strftime("%Y-%m-%d")
     date_low_month = (now - three_month).strftime("%m")
-    if now.month == 12:
-      mes = ['noviembre','diciembre','enero']
-    elif now.month == 11:
-      mes = ['septiembre','octubre','noviembre','diciembre']
-    elif now.month == 1:
-      mes = ['diciembre','enero','febrero']
-    else:
-      mes = mes[int(date_low_month)-3:int(date_low_month)+2]
+    ##if now.month == 12:
+    ##  mes = ['noviembre','diciembre','enero']
+    ##elif now.month == 11:
+    ##  mes = ['septiembre','octubre','noviembre','diciembre']
+    ##elif now.month == 1:
+    ##  mes = ['diciembre','enero','febrero']
+    ##elif now.month < 3:
+    ##  mes = mes[:int(date_low_month)+2]
+    ##else:
+    ##  mes = mes[int(date_low_month)-3:int(date_low_month)+2]
     #mes = mes[int(date_low_month)-1:]
+    mes = mes[:]
     min_fecha_doc = (rid.fecha_subida - three_month).strftime("%Y-%m-%d")
     #print subcat_tuples
     subcat_tuples2 = list(Subcategoria.objects.filter(id__in = subcat_tuples))
