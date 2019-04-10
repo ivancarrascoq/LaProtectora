@@ -228,7 +228,7 @@ def edit(request, rid):
     #fechas limites inferiores
     one_month = datetime.timedelta(30)
     two_month = datetime.timedelta(60)
-    three_month = datetime.timedelta(90)
+    three_month = datetime.timedelta(120)
     now = datetime.date.today()
     date_low_limit = (now - three_month).strftime("%Y-%m-%d")
     date_low_month = (now - three_month).strftime("%m")
