@@ -289,7 +289,7 @@
 
 
       {#% block menuleft %#}
-        <div class="col-sm-1 sidenav">
+        <div class="col-sm-2 sidenav">
           <p><span class="titulo-sidenav">Rendiciones cerradas</span></p>
 	  <!--h4>Rendiciones Cerradas</h4-->
           {% for i in rall %}
@@ -303,7 +303,7 @@
       {#% endblock %#}
 
       {#% block content %#}
-        <div class="col-sm-11 text-left" id="detalle">
+        <div class="col-sm-10 text-left" id="detalle">
 	{% if rid != None %}
           <h2>Portal de Reportes <button id="print-button" onclick="myFunction()" class="btn btn-success">Imprimir</button></h2> 
           <!--div class="col-md-12"-->
