@@ -229,6 +229,7 @@ def edit(request, rid):
     one_month = datetime.timedelta(30)
     two_month = datetime.timedelta(60)
     three_month = datetime.timedelta(120)
+    four_month = datetime.timedelta(150)
     now = datetime.date.today()
     date_low_limit = (now - three_month).strftime("%Y-%m-%d")
     date_low_month = (now - three_month).strftime("%m")
@@ -244,7 +245,7 @@ def edit(request, rid):
     ##  mes = mes[int(date_low_month)-3:int(date_low_month)+2]
     #mes = mes[int(date_low_month)-1:]
     mes = mes[:]
-    min_fecha_doc = (rid.fecha_subida - three_month).strftime("%Y-%m-%d")
+    min_fecha_doc = (rid.fecha_subida - four_month).strftime("%Y-%m-%d")
     #print subcat_tuples
     subcat_tuples2 = list(Subcategoria.objects.filter(id__in = subcat_tuples))
     conhijo_tuples2 = list(ContabilidadHijo.objects.filter(id__in = conhijo_tuples)) 
