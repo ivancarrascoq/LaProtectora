@@ -349,7 +349,7 @@
                 $(document.body).on('change','#fecharendicion', function() {
                     var fecha = $('#fecharendicion').val().split('-');
 		                var new_date = fecha[0] + "-" + fecha[1] + "-" + "01";
-                    var mes = fecha[1] - 2;
+                    var mes = fecha[1] - 3;
                     if (mes < 10) { mes = '0' + mes; };
                     var new_date_min = fecha[0] + "-" + mes + "-" + "01";
                     /*console.log(new_date);*/
@@ -1135,7 +1135,7 @@
                     var fecha = $('#fecharendicion').val().split('-');
                     /*console.log(fecha[1]);console.log(fecha[0]);*/
                     var new_date = fecha[0] + "-" + fecha[1] + "-" + "01";
-                    var mes = fecha[1] - 2;
+                    var mes = fecha[1] - 3;
                     if (mes < 10) { mes = '0' + mes; };
                     //console.log(mes);
                     var new_date_min = fecha[0] + "-" + mes + "-" + "01";
